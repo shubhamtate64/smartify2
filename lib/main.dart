@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:Smartify/controller/WeatherController.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -28,6 +29,7 @@ void main() async {
   Get.put(LoginController());  
   Get.put(HomeController()); 
   Get.put(RegistrationController());
+  Get.put(WeatherController());
 
   
   runApp(ScreenUtilInit(

@@ -38,7 +38,6 @@ flutter:
   
   assets:
     - assets/man1.jpg
-    - /home/shubham/smartify/assets/formFill.jpg
     - assets/home_icon.png
     - assets/lamp_icon.png
     - assets/man1.png

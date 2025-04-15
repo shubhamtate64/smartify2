@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -29,7 +30,7 @@ class _HomePageState extends State<HomePage>
   final notificationPageController = Get.put(NotificationPageController());
   final ConnectivityService connectivityService =
       Get.find<ConnectivityService>();
-  final weatherController = Get.put(WeatherController());
+  final weatherController = Get.find<WeatherController>();
 
   final notificationCount = 5.obs;
 
@@ -253,20 +254,45 @@ class _HomePageState extends State<HomePage>
                     },
                   ),
                 ),
-
-               SliverToBoxAdapter(
+SliverToBoxAdapter(
   child: Obx(() {
     if (!weatherController.permissionGranted.value) {
-      return Center(
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 32),
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.location_off, color: Colors.red, size: 40),
-            SizedBox(height: 10),
-            Text("Location permission required"),
-            ElevatedButton(
+            Icon(Icons.location_off, color: Colors.red, size: 60),
+            SizedBox(height: 16),
+            Text(
+              "Location is turned off",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 8),
+            Text(
+              "Please enable location to view weather info.",
+              style: TextStyle(color: Colors.grey[700]),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 20),
+            ElevatedButton.icon(
+              onPressed: () {
+                Geolocator.openLocationSettings(); // opens device location settings
+              },
+              icon: Icon(Icons.settings),
+              label: Text("Enable Location"),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blue,
+                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+            ),
+            TextButton(
               onPressed: weatherController.retry,
               child: Text("Retry"),
-            )
+            ),
           ],
         ),
       );
@@ -275,7 +301,11 @@ class _HomePageState extends State<HomePage>
     if (weatherController.isLoading.value) {
       return SizedBox(
         height: 180,
-        child: Center(child: CircularProgressIndicator()),
+        child: Center(
+          child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+          ),
+        ),
       );
     }
 
@@ -312,7 +342,13 @@ class _HomePageState extends State<HomePage>
                 children: [
                   Row(
                     children: [
-                      Icon(Icons.cloud, color: Colors.white, size: 30),
+                      Icon(
+                        Icons.cloud,
+                        color: data.condition.contains("Rain")
+                            ? Colors.blue
+                            : Colors.white,
+                        size: 30,
+                      ),
                       SizedBox(width: 10),
                       Text(
                         data.condition,
@@ -362,6 +398,8 @@ class _HomePageState extends State<HomePage>
     );
   }),
 ),
+
+
 
 
                 // SliverAppBar and other UI code (no changes)

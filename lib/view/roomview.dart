@@ -88,7 +88,7 @@ class RoomView extends StatelessWidget {
                         Device device = room.devices[index];
 
                         // Check if the device is a fan
-                        if ( controller.selectedDeviceType.value ==  "Fan") {  //device.deviceName.toLowerCase() == "fan" &&
+                        if ( device.iconName.toLowerCase() ==  "fan") {  //device.deviceName.toLowerCase() == "fan" &&
                           return GestureDetector(
                             onTap: () {
                               Get.dialog(
@@ -307,12 +307,14 @@ class RoomView extends StatelessWidget {
                                 ),
                                 child: Row(
                                   children: [
-                                    Icon(
-                                      controller.deviceRoomIcons[controller
-                                              .selectedDeviceType.value] ??
-                                          Icons.device_unknown,
-                                      color: Colors.blueAccent,
-                                      size: 30,
+                                    Obx(
+                                      ()=> Icon(
+                                        controller.deviceRoomIcons[controller
+                                                .selectedDeviceType.value] ??
+                                            Icons.device_unknown,
+                                        color: Colors.blueAccent,
+                                        size: 30,
+                                      ),
                                     ),
                                     SizedBox(width: 10),
                                     Obx(() {
