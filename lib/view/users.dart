@@ -147,7 +147,9 @@ class _UserListScreenState extends State<UserListScreen>
         final user = filteredUsers[index];
         return GestureDetector(
             onTap: () {
-              Get.to(() => UserDetailScreen(user: user));
+              if(user.requestStatus.value.toUpperCase() == "A"){
+                Get.to(() => UserDetailScreen(user: user));
+              }
             },
             child: Container(
               margin: EdgeInsets.all(10),
