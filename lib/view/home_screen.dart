@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:Smartify/view/DummyWeatherContainer.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 
@@ -11,7 +12,6 @@ import '../controller/WeatherController.dart';
 import '../controller/home_screen_room_controller.dart';
 import '../controller/login_screen_controller.dart';
 import '../controller/notification_page_controller.dart';
-import '../main.dart';
 import '../services/connectivity_service.dart';
 import '../view/notification_page.dart';
 import '../view/roomview.dart';
@@ -40,7 +40,7 @@ class _HomePageState extends State<HomePage>
   void initState() {
     super.initState();
 
-    WidgetsBinding.instance.addObserver(this);
+    // WidgetsBinding.instance.addObserver(this);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       controller.getAllRoomsData();
@@ -52,80 +52,80 @@ class _HomePageState extends State<HomePage>
       notificationCount.value = notificationPageController.list.length;
     }
 
-    ever(connectivityService.isOnline, (bool online) {
-      if (online) {
-        _startAutoRefresh();
-      } else {
-        _stopAutoRefresh();
-      }
-    });
+    // ever(connectivityService.isOnline, (bool online) {
+    //   if (online) {
+    //     _startAutoRefresh();
+    //   } else {
+    //     _stopAutoRefresh();
+    //   }
+    // });
 
-    if (connectivityService.isOnline.value) {
-      _startAutoRefresh();
-    }
+    // if (connectivityService.isOnline.value) {
+    //   _startAutoRefresh();
+    // }
   }
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    routeObserver.subscribe(
-        this, ModalRoute.of(context)!); // Subscribe to route changes
-  }
+  // @override
+  // void didChangeDependencies() {
+  //   super.didChangeDependencies();
+  //   routeObserver.subscribe(
+  //       this, ModalRoute.of(context)!); // Subscribe to route changes
+  // }
 
-  @override
-  void dispose() {
-    _stopAutoRefresh();
-    routeObserver.unsubscribe(this); // Unsubscribe
-    WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
-  }
+  // @override
+  // void dispose() {
+  //   _stopAutoRefresh();
+  //   routeObserver.unsubscribe(this); // Unsubscribe
+  //   WidgetsBinding.instance.removeObserver(this);
+  //   super.dispose();
+  // }
 
-  // Called when this route becomes visible again
-  @override
-  void didPopNext() {
-    super.didPopNext();
-    if (connectivityService.isOnline.value) {
-      _startAutoRefresh();
-      debugPrint("Returned to HomePage → timer started");
-    }
-  }
+  // // Called when this route becomes visible again
+  // @override
+  // void didPopNext() {
+  //   super.didPopNext();
+  //   if (connectivityService.isOnline.value) {
+  //     _startAutoRefresh();
+  //     debugPrint("Returned to HomePage → timer started");
+  //   }
+  // }
 
-  // Called when navigating away from this page
-  @override
-  void didPushNext() {
-    _stopAutoRefresh();
-    debugPrint("Navigated away from HomePage → timer stopped");
-  }
+  // // Called when navigating away from this page
+  // @override
+  // void didPushNext() {
+  //   _stopAutoRefresh();
+  //   debugPrint("Navigated away from HomePage → timer stopped");
+  // }
 
-  void _startAutoRefresh() {
-    _stopAutoRefresh(); // ensure only one timer runs
-    print("⏱️ Starting timer");
-    _timer = Timer.periodic(Duration(seconds: 2), (timer) {
-      if (mounted && connectivityService.isOnline.value) {
-        //controller.GetDeviceLiveStatus();
-        print("Fetching live status...");
-      }
-    });
-  }
+  // void _startAutoRefresh() {
+  //   _stopAutoRefresh(); // ensure only one timer runs
+  //   print("⏱️ Starting timer");
+  //   _timer = Timer.periodic(Duration(seconds: 2), (timer) {
+  //     if (mounted && connectivityService.isOnline.value) {
+  //       controller.GetDeviceLiveStatus();
+  //       print("Fetching live status...");
+  //     }
+  //   });
+  // }
 
-  void _stopAutoRefresh() {
-    if (_timer != null) {
-      print("🛑 Stopping timer");
-      _timer?.cancel();
-      _timer = null;
-    }
-  }
+  // void _stopAutoRefresh() {
+  //   if (_timer != null) {
+  //     print("🛑 Stopping timer");
+  //     _timer?.cancel();
+  //     _timer = null;
+  //   }
+  // }
 
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.paused) {
-      _stopAutoRefresh();
-    } else if (state == AppLifecycleState.resumed) {
-      if (connectivityService.isOnline.value) {
-        _startAutoRefresh();
-      }
-    }
-  }
+  // @override
+  // void didChangeAppLifecycleState(AppLifecycleState state) {
+  //   if (state == AppLifecycleState.paused) {
+  //     _stopAutoRefresh();
+  //   } else if (state == AppLifecycleState.resumed) {
+  //     if (connectivityService.isOnline.value) {
+  //       _startAutoRefresh();
+  //     }
+  //   }
+  // }
 
   Future<bool> _onWillPop() async {
     bool exit = await Get.dialog(
@@ -299,14 +299,16 @@ SliverToBoxAdapter(
     }
 
     if (weatherController.isLoading.value) {
-      return SizedBox(
-        height: 180,
-        child: Center(
-          child: CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
-          ),
-        ),
-      );
+
+      return DummyWeatherContainer();
+      // return SizedBox(
+      //   height: 180,
+      //   child: Center(
+      //     child: CircularProgressIndicator(
+      //       valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+      //     ),
+      //   ),
+      // );
     }
 
     final data = weatherController.weatherData.value;
@@ -611,6 +613,10 @@ SliverToBoxAdapter(
                               ),
                             ),
                           ),
+
+                          if(controller.roomTypeError.isEmpty)
+                                  Obx(()=> Text(controller.roomTypeError.value)),
+
 
                           SizedBox(height: 10),
 

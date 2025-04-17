@@ -38,6 +38,7 @@ class HomeController extends GetxController {
   var userName = ''.obs;
   RxString roomName = ''.obs; // Reactive variable for room name
   RxString roomNameError = ''.obs;
+  RxString roomTypeError = "".obs;
   RxString deviceName = ''.obs; // Reactive variable for room name
   RxString deviceNameError = ''.obs; 
   var selectedDeviceType = 'Light'.obs; 
@@ -462,10 +463,12 @@ Future<void> restoreUser(String userId) async {
   // Method to add a room
   Future<void> addRoom(String roomName, String roomType) async {
   // Validate room name
-  if (roomName.trim().isEmpty) {
+  if (roomName.trim().isEmpty && roomType.trim().isEmpty) {
     roomNameError.value = 'Room name cannot be empty';
+    roomTypeError.value = 'roomType cannot be empty';
   } else {
     roomNameError.value = '';
+    roomTypeError.value ="";
 
 
     var random = Random();
