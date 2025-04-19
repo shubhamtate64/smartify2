@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../../controller/home_screen_room_controller.dart';
 import '../../view/profileView.dart';
@@ -7,91 +8,99 @@ import '../../view/users.dart';
 import '../../controller/login_screen_controller.dart';
 
 class MyDrawer extends StatelessWidget {
-  final LoginController loginController =
-      Get.put(LoginController());
-      HomeController homeController = Get.find<HomeController>();
+  final LoginController loginController = Get.put(LoginController());
+  final HomeController homeController = Get.find<HomeController>();
 
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      backgroundColor: Colors.grey[400],
+      backgroundColor: Colors.white,
       child: Column(
         children: [
           // Dynamic User Header
-          Obx(() => UserAccountsDrawerHeader(
-                accountName: Text(
-                  "${loginController.mainUser?.firstName} ${loginController.mainUser?.lastName}" ?? 'Guest',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
-                ),
-                accountEmail: Text(
-                  loginController.mainUser!.email.isEmpty ? "No Email" : loginController.mainUser!.email.toString(),
-                  style: TextStyle(fontSize: 16, color: Colors.white),
-                ),
-                currentAccountPicture: CircleAvatar(
-                  backgroundColor: Colors.white,
-                  child: _getUserAvatar(loginController.mainUser!.gender.toString()),
-                ),
-                decoration: BoxDecoration(color: Colors.black),
-              )),
+          Obx(() {
+            final user = loginController.mainUser;
+            final name = "${user?.firstName.value ?? 'Guest'} ${user?.lastName.value ?? ''}".trim();
+            final email = user?.email.value ?? "No Email";
+            final gender = user?.gender.value ?? "other";
 
-          // Profile button
+            return UserAccountsDrawerHeader(
+              accountName: Text(
+                name,
+                style: GoogleFonts.aDLaMDisplay(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              accountEmail: Text(
+                email.isEmpty ? "No Email" : email,
+                style: GoogleFonts.aDLaMDisplay(fontSize: 16, color: Colors.white),
+              ),
+              currentAccountPicture: CircleAvatar(
+                backgroundColor: Colors.white,
+                child: _getUserAvatar(gender),
+              ),
+              decoration: BoxDecoration(color: Colors.black),
+            );
+          }),
+
           _buildDrawerItem(
             icon: Icons.person,
             text: "Profile",
             onTap: () => Get.to(() => ProfileView()),
           ),
 
-          // Show "Add User" only if admin
-          Obx(() =>loginController.mainUser!.role.value == '1' ||loginController.mainUser!.role.value == '2'
-              ? _buildDrawerItem(
-                  icon: Icons.person_add,
-                  text: "Users",
-                  onTap: () => Get.to(() => UserListScreen()),
-                )
-              : SizedBox()),
-
-          // Show "Show Users" only if admin
-          // Obx(() => loginController.mainUser!.role.value == '1'||loginController.mainUser!.role.value == '2'
-          //     ? _buildDrawerItem(
-          //         icon: Icons.people,
-          //         text: "Rooms",
-          //         onTap: () => Get.to(() => ShowUsers()),
-          //       )
-          //     : SizedBox()),
+          // Show Users option only for admin roles
+          Obx(() {
+            final role = loginController.mainUser?.role.value ?? '';
+            return (role == '1' || role == '2')
+                ? _buildDrawerItem(
+                    icon: Icons.person_add,
+                    text: "Users",
+                    onTap: () => Get.to(() => UserListScreen()),
+                  )
+                : SizedBox();
+          }),
 
           Spacer(),
           Divider(),
 
-          // Logout Button
-          _buildDrawerItem(
-            icon: Icons.exit_to_app,
-            text: "Logout",
-            onTap: () {
-              // homeController.logout();
-              Get.offAllNamed('/login');
-            },
-          ),
+          // _buildDrawerItem(
+          //   icon: Icons.exit_to_app,
+          //   text: "Logout",
+          //   onTap: () {
+          //     Get.offAllNamed('/login');
+          //   },
+          // ),
         ],
       ),
     );
   }
 
-  // Method to get user avatar based on gender
+  // User avatar based on gender
   Widget _getUserAvatar(String gender) {
     if (gender.toLowerCase() == "male") {
-      return ClipOval(child: Image.asset('assets/MaleAvtar.png', width: 60, height: 60, fit: BoxFit.cover));
+      return ClipOval(
+        child: Image.asset('assets/MaleAvtar.png', width: 60, height: 60, fit: BoxFit.cover),
+      );
     } else if (gender.toLowerCase() == "female") {
-      return ClipOval(child: Image.asset('assets/FemaleAvtar.png', width: 60, height: 60, fit: BoxFit.cover));
+      return ClipOval(
+        child: Image.asset('assets/FemaleAvtar.png', width: 60, height: 60, fit: BoxFit.cover),
+      );
     } else {
       return Icon(Icons.person, color: Colors.black, size: 40);
     }
   }
 
-  // Drawer Item Widget
+  // Drawer item builder with custom font
   Widget _buildDrawerItem({required IconData icon, required String text, required VoidCallback onTap}) {
     return ListTile(
       leading: Icon(icon, color: Colors.black),
-      title: Text(text, style: TextStyle(fontSize: 16)),
+      title: Text(
+        text,
+        style: GoogleFonts.aDLaMDisplay(fontSize: 16, color: Colors.black),
+      ),
       onTap: onTap,
     );
   }

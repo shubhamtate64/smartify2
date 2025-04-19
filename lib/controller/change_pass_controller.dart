@@ -1,3 +1,6 @@
+import 'dart:developer';
+
+import 'package:Smartify/httplocalhost/httpglobal.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
@@ -59,27 +62,47 @@ class ChangePasswordController extends GetxController {
     }
   }
 
-  Future<void> updatePassword(String email, String newPassword) async {
+  Future<void> updatePassword(String email, String newPassword,String oldPassword) async {
     try {
       isLoading(true);
       var response = await http.post(
-        Uri.parse('https://your-api.com/update-password'),
+        Uri.parse('$httpHomeAutomation/EndUserController/ResetPassword'),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({
           "email": email,
           "newPassword": newPassword,
+          "oldPassword":oldPassword,
+
         }),
       );
 
-      var data = json.decode(response.body);
-      if (data['success'] == true) {
-        Get.snackbar("Success", "Password updated successfully!",
+      Map<String,dynamic> data = json.decode(response.body);
+      String val = data["message"];
+
+      if(val ==  "Password reset successfuly.!"){
+          Get.snackbar("message", "Password reset successfuly.!",
             backgroundColor: Colors.green, colorText: Colors.white);
-        Get.to(()=>LoginScreen()); // Navigate back to login screen
-      } else {
-        Get.snackbar("Error", "Failed to update password",
-            backgroundColor: Colors.red, colorText: Colors.white);
+        Future.delayed(Duration(seconds: 1), () {
+          // Navigate to the Login page after the snackbar is displayed
+          Get.off(() => LoginScreen()); // Replace with your actual LoginPage class
+        });
+
+      }else{
+        log(val);
+         Get.snackbar("Invalid", "Email or Password !",
+            backgroundColor: const Color.fromARGB(255, 255, 0, 0), colorText: Colors.white);
       }
+
+      // Navigate back to login screen
+
+      // if (data['success'] == true) {
+      //   Get.snackbar("Success", "Password updated successfully!",
+      //       backgroundColor: Colors.green, colorText: Colors.white);
+      //   Get.offAll(()=>LoginScreen()); // Navigate back to login screen
+      // } else {
+      //   Get.snackbar("Error", "Failed to update password",
+      //       backgroundColor: Colors.red, colorText: Colors.white);
+      // }
     } catch (e) {
       Get.snackbar("Error", "Something went wrong: $e",
           backgroundColor: Colors.red, colorText: Colors.white);

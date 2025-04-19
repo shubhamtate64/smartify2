@@ -78,8 +78,8 @@ class LoginController extends GetxController {
   // }
 
   void login() {
-    emailController.text = "admin1@gmail.com"; // Default values for testing
-    passwordController.text = "1234";
+    emailController.text = "shubhamtate70@gmail.com"; // Default values for testing
+    passwordController.text = "12345";
 
     validatePassword(passwordController.text.trim());
     validateEmail(emailController.text.trim());
@@ -123,10 +123,9 @@ class LoginController extends GetxController {
 
         if (data['token'].isNotEmpty) {
           mainUser = MainUser.fromJson(data);
-          print(mainUser!.toJson());
-
+          
           Get.offAll(
-              () => BaseScreen(child: HomePage())); // Navigate to HomePage
+              () => HomePage()); // Navigate to HomePage
         } else {
           Get.snackbar("Login Failed", "Invalid email or password",
               backgroundColor: Colors.red, colorText: Colors.white);
@@ -136,7 +135,7 @@ class LoginController extends GetxController {
             backgroundColor: Colors.red, colorText: Colors.white);
       }
     } catch (e) {
-      Get.snackbar("Error", "Something went wrong: $e",
+      Get.snackbar("message", "Your request still pending",
           backgroundColor: Colors.red, colorText: Colors.white);
     } finally {
       isLoading(false);

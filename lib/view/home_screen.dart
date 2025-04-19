@@ -44,6 +44,7 @@ class _HomePageState extends State<HomePage>
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       controller.getAllRoomsData();
+      // controller.GetDeviceLiveStatus();
     });
 
     if (loginController.mainUser!.role.value == '1' ||

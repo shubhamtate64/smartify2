@@ -24,7 +24,7 @@ class UserListScreen extends StatefulWidget {
 class _UserListScreenState extends State<UserListScreen>
     with RouteAware, SingleTickerProviderStateMixin {
   final HomeController homeController = Get.find<HomeController>();
-  late TabController _tabController;
+  late TabController _tabController ; // ✅ Match the actual number of views
 
   // @override
   // void initState() {
@@ -39,7 +39,9 @@ class _UserListScreenState extends State<UserListScreen>
     super.initState();
     homeController.getAllUserData(); // load initially
     _tabController = TabController(
-        length: 4, vsync: this); // Four tabs: All, Pending, Accepted, Deleted
+      length: 3,
+      vsync: this,
+    ); // Four tabs: All, Pending, Accepted, Deleted
   }
 
   @override
@@ -69,42 +71,56 @@ class _UserListScreenState extends State<UserListScreen>
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("User List"),
+        title: Text("Users"),
         bottom: TabBar(
           controller: _tabController,
           tabs: [
             Tab(
               child: Text(
                 "All Users",
-                style: TextStyle(fontSize: fontSize), // Adjust font size
+                style: GoogleFonts.aDLaMDisplay(
+                  fontSize: fontSize,
+                  color:
+                      Colors.black, // Optional: ensure it's not default white
+                  fontWeight: FontWeight.w500, // Optional: style tweak
+                ),
               ),
             ),
             Tab(
               child: Text(
                 "Pending",
-                style: TextStyle(fontSize: fontSize), // Adjust font size
+                style: GoogleFonts.aDLaMDisplay(
+                  fontSize: fontSize,
+                  color: Colors.black,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
             Tab(
               child: Text(
                 "Accepted",
-                style: TextStyle(fontSize: fontSize), // Adjust font size
+                style: GoogleFonts.aDLaMDisplay(
+                  fontSize: fontSize,
+                  color: Colors.black,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
-            Tab(
-              child: Text(
-                "Deleted",
-                style: TextStyle(fontSize: fontSize), // Adjust font size
-              ),
-            ),
+
+            // Tab(
+            //   child: Text(
+            //     "Deleted",
+            //     style: TextStyle(fontSize: fontSize), // Adjust font size
+            //   ),
+            // ),
           ],
         ),
       ),
       body: Obx(() {
         if (homeController.isLoading.value) {
           return Center(
-              child:
-                  CircularProgressIndicator()); // Show loader while fetching data
+            child: CircularProgressIndicator(),
+          ); // Show loader while fetching data
         }
 
         return TabBarView(
@@ -118,9 +134,6 @@ class _UserListScreenState extends State<UserListScreen>
 
             // Tab for Accepted users
             _buildUserList('A'),
-
-            // Tab for Deleted users
-            _buildUserList('D'),
           ],
         );
       }),
@@ -129,16 +142,18 @@ class _UserListScreenState extends State<UserListScreen>
 
   // Helper function to build a list of users based on requestStatus or show all users
   Widget _buildUserList(String status) {
-    List<UserModel> filteredUsers = (status == 'All')
-        ? homeController.users
-        : homeController.users.where((user) {
-            return user.requestStatus.value == status ||
-                user.activeFlag.value == "N";
-          }).toList();
+    List<UserModel> filteredUsers =
+        (status == 'All')
+            ? homeController.users
+            : homeController.users.where((user) {
+              return user.requestStatus.value == status ||
+                  user.activeFlag.value == "N";
+            }).toList();
 
     if (filteredUsers.isEmpty) {
       return Center(
-          child: Text("No users with status ${_getStatusText(status)}"));
+        child: Text("No users with status ${_getStatusText(status)}"),
+      );
     }
 
     return ListView.builder(
@@ -146,107 +161,110 @@ class _UserListScreenState extends State<UserListScreen>
       itemBuilder: (context, index) {
         final user = filteredUsers[index];
         return GestureDetector(
-            onTap: () {
-              if(user.requestStatus.value.toUpperCase() == "A"){
-                Get.to(() => UserDetailScreen(user: user));
-              }
-            },
-            child: Container(
-              margin: EdgeInsets.all(10),
-              padding: EdgeInsets.all(15),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade100, // Background black
-                // border: Border.all(color: Colors.black, width: 00.1),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  double screenWidth = MediaQuery.of(context).size.width;
-                  double baseFontSize = screenWidth * 0.04;
+          onTap: () {
+            if (user.requestStatus.value.toUpperCase() == "A") {
+              Get.to(() => UserDetailScreen(user: user));
+            }
+          },
+          child: Container(
+            margin: EdgeInsets.all(10),
+            padding: EdgeInsets.all(15),
+            decoration: BoxDecoration(
+              color: Colors.grey.shade100, // Background black
+              // border: Border.all(color: Colors.black, width: 00.1),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                double screenWidth = MediaQuery.of(context).size.width;
+                double baseFontSize = screenWidth * 0.04;
 
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        user.name.value,
-                        style: GoogleFonts.aDLaMDisplay(
-                          color: Colors.black,
-                          fontSize: baseFontSize + 2,
-                          fontWeight: FontWeight.bold,
-                        ),
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "${user.name.value} ${user.lastName.value}",
+                      style: GoogleFonts.aDLaMDisplay(
+                        color: Colors.black,
+                        fontSize: baseFontSize + 2,
+                        fontWeight: FontWeight.bold,
                       ),
-                      SizedBox(height: 5),
-                      Text(
-                        user.mobileNo.value,
-                        style: GoogleFonts.aDLaMDisplay(
-                          color: Colors.black,
-                          fontSize: baseFontSize,
-                        ),
+                    ),
+                    SizedBox(height: 5),
+                    // Text(
+                    //   user.mobileNo.value,
+                    //   style: GoogleFonts.aDLaMDisplay(
+                    //     color: Colors.black,
+                    //     fontSize: baseFontSize,
+                    //   ),
+                    // ),
+                    Text(
+                      user.email.value,
+                      style: GoogleFonts.aDLaMDisplay(
+                        color: Colors.black,
+                        fontSize: baseFontSize,
                       ),
-                      Text(
-                        user.email.value,
-                        style: GoogleFonts.aDLaMDisplay(
-                          color: Colors.black,
-                          fontSize: baseFontSize,
-                        ),
+                    ),
+                    // Text(
+                    //   "Role: ${user.role}",
+                    //   style: GoogleFonts.aDLaMDisplay(
+                    //     color: Colors.black,
+                    //     fontSize: baseFontSize - 1,
+                    //   ),
+                    // ),
+                    Text(
+                      "Status: ${_getStatusText(user.requestStatus.value)}",
+                      style: GoogleFonts.aDLaMDisplay(
+                        color: Colors.orangeAccent,
+                        fontSize: baseFontSize - 1,
                       ),
-                      Text(
-                        "Role: ${user.role}",
-                        style: GoogleFonts.aDLaMDisplay(
-                          color: Colors.black,
-                          fontSize: baseFontSize - 1,
-                        ),
-                      ),
-                      Text(
-                        "Status: ${_getStatusText(user.requestStatus.value)}",
-                        style: GoogleFonts.aDLaMDisplay(
-                          color: Colors.orangeAccent,
-                          fontSize: baseFontSize - 1,
-                        ),
-                      ),
+                    ),
 
-                      // Action buttons
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          if (user.requestStatus == 'A') ...[
-                            IconButton(
-                              icon: Icon(Icons.delete, color: Colors.red),
-                              onPressed: () => _deleteUser(user),
-                            ),
-                            IconButton(
-                              icon: Icon(Icons.restore, color: Colors.green),
-                              onPressed: () => _restoreUser(user),
-                            ),
-                          ],
-                          if (user.requestStatus == 'P') ...[
-                            IconButton(
-                              icon: Icon(Icons.check, color: Colors.green),
-                              onPressed: () => _acceptUser(user),
-                            ),
-                            IconButton(
-                              icon: Icon(Icons.delete, color: Colors.red),
-                              onPressed: () => _deleteUser(user),
-                            ),
-                          ],
-                          if (user.requestStatus == 'D') ...[
-                            IconButton(
-                              icon: Icon(Icons.restore, color: Colors.green),
-                              onPressed: () => _restoreUser(user),
-                            ),
-                            IconButton(
-                              icon: Icon(Icons.delete_forever,
-                                  color: Colors.grey),
-                              onPressed: () => _permanentlyDeleteUser(user),
-                            ),
-                          ],
+                    // Action buttons
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        if (user.requestStatus == 'A') ...[
+                          IconButton(
+                            icon: Icon(Icons.delete, color: Colors.red),
+                            onPressed: () => _deleteUser(user),
+                          ),
+                          IconButton(
+                            icon: Icon(Icons.restore, color: Colors.green),
+                            onPressed: () => _restoreUser(user),
+                          ),
                         ],
-                      ),
-                    ],
-                  );
-                },
-              ),
-            ));
+                        if (user.requestStatus == 'P') ...[
+                          IconButton(
+                            icon: Icon(Icons.check, color: Colors.green),
+                            onPressed: () => _acceptUser(user),
+                          ),
+                          IconButton(
+                            icon: Icon(Icons.delete, color: Colors.red),
+                            onPressed: () => _deleteUser(user),
+                          ),
+                        ],
+                        if (user.requestStatus == 'D') ...[
+                          IconButton(
+                            icon: Icon(Icons.restore, color: Colors.green),
+                            onPressed: () => _restoreUser(user),
+                          ),
+                          IconButton(
+                            icon: Icon(
+                              Icons.delete_forever,
+                              color: Colors.grey,
+                            ),
+                            onPressed: () => _permanentlyDeleteUser(user),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+        );
       },
     );
   }
@@ -289,6 +307,11 @@ class _UserListScreenState extends State<UserListScreen>
   }
 }
 
+// Responsive font utility
+double getResponsiveFontSize(BuildContext context, double baseSize) {
+  return baseSize * MediaQuery.of(context).textScaleFactor;
+}
+
 class UserDetailScreen extends StatefulWidget {
   final UserModel user;
   const UserDetailScreen({required this.user, Key? key}) : super(key: key);
@@ -304,59 +327,70 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.user.name.value),
-        // leading: InkWell(
-        //     onTap: () async {
-
-        //       await homeController.getAllRoomsData();
-        //       Get.back();
-        //     },
-        //     child: Icon(Icons.arrow_back_rounded)),
+        title: Text(
+          widget.user.name.value,
+          style: GoogleFonts.aDLaMDisplay(
+            color: Colors.black,
+            fontSize: getResponsiveFontSize(context, 20),
+          ),
+        ),
       ),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // User Info Container
             Container(
               margin: EdgeInsets.all(10),
               padding: EdgeInsets.all(15),
               decoration: BoxDecoration(
-                border: Border.all(color: Colors.yellow, width: 2),
+                color: Colors.white,
+                // border: Border.all(color: Colors.yellow, width: 2),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(widget.user.name.value,
-                      style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.red)),
+                  Text(
+                    "${widget.user.name.value} ${widget.user.lastName.value}",
+                    style: GoogleFonts.aDLaMDisplay(
+                      fontSize: getResponsiveFontSize(context, 18),
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
                   SizedBox(height: 5),
-                  Text(widget.user.mobileNo.value,
-                      style: TextStyle(fontSize: 16, color: Colors.pink)),
-                  Text(widget.user.email.value,
-                      style: TextStyle(fontSize: 16, color: Colors.pink)),
+                  // Text(widget.user.lastName.value,
+                  //     style: GoogleFonts.aDLaMDisplay(
+                  //       fontSize: getResponsiveFontSize(context, 16),
+                  //       color: Colors.black,
+                  //     )),
+                  Text(
+                    widget.user.email.value,
+                    style: GoogleFonts.aDLaMDisplay(
+                      fontSize: getResponsiveFontSize(context, 16),
+                      color: Colors.black,
+                    ),
+                  ),
                 ],
               ),
             ),
-
-            // Rooms List
             Obx(() {
-              // if (homeController.isLoading.value) {
-              //   return Center(child: CircularProgressIndicator());
-              // }
               if (homeController.rooms.isEmpty) {
-                return Center(child: Text("No Rooms Found"));
+                return Center(
+                  child: Text(
+                    "No Rooms Found",
+                    style: GoogleFonts.aDLaMDisplay(
+                      fontSize: getResponsiveFontSize(context, 16),
+                      color: Colors.black,
+                    ),
+                  ),
+                );
               }
 
               return Column(
-                children: homeController.rooms.map((room) {
-                  return RoomWidget(
-                    room: room,
-                    user: widget.user,
-                  );
-                }).toList(),
+                children:
+                    homeController.rooms.map((room) {
+                      return RoomWidget(room: room, user: widget.user);
+                    }).toList(),
               );
             }),
           ],
@@ -370,11 +404,12 @@ class RoomWidget extends StatelessWidget {
   final Room room;
   final UserModel user;
   RoomWidget({required this.room, required this.user, Key? key})
-      : super(key: key);
+    : super(key: key);
 
   void _showEditDialog(BuildContext context) {
-    TextEditingController roomController =
-        TextEditingController(text: room.name);
+    TextEditingController roomController = TextEditingController(
+      text: room.name,
+    );
 
     showModalBottomSheet(
       context: context,
@@ -387,14 +422,17 @@ class RoomWidget extends StatelessWidget {
               TextField(
                 controller: roomController,
                 decoration: InputDecoration(labelText: "Room Name"),
+                style: GoogleFonts.aDLaMDisplay(color: Colors.black),
               ),
               SizedBox(height: 10),
               ElevatedButton(
                 onPressed: () {
-                  // TODO: Call API to update room name
                   Navigator.pop(context);
                 },
-                child: Text("Save"),
+                child: Text(
+                  "Save",
+                  style: GoogleFonts.aDLaMDisplay(color: Colors.black),
+                ),
               ),
             ],
           ),
@@ -409,29 +447,33 @@ class RoomWidget extends StatelessWidget {
       margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       padding: EdgeInsets.all(10),
       decoration: BoxDecoration(
-        border: Border.all(color: Colors.yellow, width: 2),
+        color: Colors.white,
+        // border: Border.all(color: Colors.yellow, width: 2),
         borderRadius: BorderRadius.circular(10),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Room Name & Edit Button
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(room.name,
-                  style: TextStyle(fontSize: 18, color: Colors.green)),
-              // IconButton(
-              //   icon: Icon(Icons.edit),
-              //   onPressed: () => _showEditDialog(context),
-              // ),
+              Text(
+                room.name,
+                style: GoogleFonts.aDLaMDisplay(
+                  fontSize: getResponsiveFontSize(context, 18),
+                  color: Colors.black,
+                ),
+              ),
             ],
           ),
-
-          // Device List
           ...room.devices
-              .map((device) => DeviceSwitch(
-                  device: device, userId: user.id.value, user: user))
+              .map(
+                (device) => DeviceSwitch(
+                  device: device,
+                  userId: user.id.value,
+                  user: user,
+                ),
+              )
               .toList(),
         ],
       ),
@@ -442,14 +484,14 @@ class RoomWidget extends StatelessWidget {
 class DeviceSwitch extends StatefulWidget {
   final Device device;
   final String userId;
-  final UserModel user; // User ID
+  final UserModel user;
 
-  DeviceSwitch(
-      {required this.device,
-      required this.userId,
-      required this.user,
-      Key? key})
-      : super(key: key);
+  DeviceSwitch({
+    required this.device,
+    required this.userId,
+    required this.user,
+    Key? key,
+  }) : super(key: key);
 
   @override
   _DeviceSwitchState createState() => _DeviceSwitchState();
@@ -457,30 +499,25 @@ class DeviceSwitch extends StatefulWidget {
 
 class _DeviceSwitchState extends State<DeviceSwitch> {
   bool isDeviceOn = false;
-
-  HomeController homeController =
-      Get.find<HomeController>(); // Store previous authorized devices
+  HomeController homeController = Get.find<HomeController>();
 
   @override
   void initState() {
     super.initState();
-
-    // Store the previous authorized devices (comma-separated string)
     homeController.previousDeviceIds.value = widget.user.devices.value;
 
-    // Check if the device ID exists in the user's authorized devices list
-    List<String> authorizedDevices =
-        homeController.previousDeviceIds.value.split(',');
+    List<String> authorizedDevices = homeController.previousDeviceIds.value
+        .split(',');
     if (authorizedDevices.contains(widget.device.id.toString())) {
       setState(() {
-        isDeviceOn = true; // Turn switch ON if the device is authorized
+        isDeviceOn = true;
       });
     }
   }
 
   void toggleDevice(bool newState) async {
     setState(() {
-      isDeviceOn = newState; // Update UI immediately
+      isDeviceOn = newState;
     });
 
     String updatedDeviceIds = homeController.previousDeviceIds.value;
@@ -488,32 +525,32 @@ class _DeviceSwitchState extends State<DeviceSwitch> {
         updatedDeviceIds.isNotEmpty ? updatedDeviceIds.split(',') : [];
 
     if (newState) {
-      // If turning ON, add the device ID (if not already present)
       if (!deviceList.contains(widget.device.id.toString())) {
         deviceList.add(widget.device.id.toString());
       }
     } else {
-      // If turning OFF, remove the device ID from the list
       deviceList.remove(widget.device.id.toString());
     }
 
-    // Join updated list into a comma-separated string
     updatedDeviceIds = deviceList.join(',');
-
-    // Update observable value in HomeController
     homeController.previousDeviceIds.value = updatedDeviceIds;
 
-    // Call API to update user's authorized devices
     await homeController.updateDeviceStatusUser(
-        updatedDeviceIds, widget.userId);
-    // await  homeController.getAllUserData();
+      updatedDeviceIds,
+      widget.userId,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return SwitchListTile(
-      title: Text(widget.device.deviceName,
-          style: TextStyle(fontSize: 16, color: Colors.purple)),
+      title: Text(
+        widget.device.deviceName,
+        style: GoogleFonts.aDLaMDisplay(
+          fontSize: getResponsiveFontSize(context, 16),
+          color: Colors.black,
+        ),
+      ),
       value: isDeviceOn,
       onChanged: toggleDevice,
     );

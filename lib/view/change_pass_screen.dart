@@ -68,7 +68,7 @@ class ChangePasswordScreen extends StatelessWidget {
       changePasswordController.triggerShake();
     } else {
       newPasswordError.value = "";
-      changePasswordController.updatePassword(email, newPassword);
+      changePasswordController.updatePassword(email, newPassword,oldPassword);
     }
   }
 
@@ -96,7 +96,8 @@ class ChangePasswordScreen extends StatelessWidget {
                     height: 50,
                     child: ElevatedButton(
                       onPressed: () {
-                        validateAndSubmit();
+                        // validateAndSubmit();
+                        changePasswordController.updatePassword(emailController.text, newPasswordController.text,oldPasswordController.text);
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.black,

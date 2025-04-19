@@ -1,3 +1,6 @@
+import 'dart:developer';
+
+import 'package:Smartify/httplocalhost/httpglobal.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controller/login_screen_controller.dart';
@@ -21,15 +24,15 @@ class ProfileController extends GetxController {
   var emailError = "".obs;
   var passwordError = "".obs;
   var confirmPasswordError = "".obs;
-    var genderError = ''.obs;
-  
+  var genderError = ''.obs;
 
-var firstName = "".obs;
+  var firstName = "".obs;
   var lastName = "".obs;
   var email = "".obs;
   var password = "".obs;
   var confirmPassword = "".obs;
   var gender = 'Select Gender'.obs;
+
   @override
   void onInit() {
     super.onInit();
@@ -37,6 +40,7 @@ var firstName = "".obs;
     firstNameController.text = user.firstName.value;
     lastNameController.text = user.lastName.value;
     emailController.text = user.email.value;
+    gender.value = user.gender.value;
   }
 
   // Method to validate the fields and update the profile
@@ -54,27 +58,52 @@ var firstName = "".obs;
         bool isUpdated = await _updateUserProfile();
         if (isUpdated) {
           // Show success snackbar and update MainUser
-          Get.snackbar('Success', 'Profile updated successfully!');
-          // Update main user fields after successful update
+          Get.snackbar(
+            'Success',
+            'Profile updated successfully!',
+            backgroundColor: Colors.green, // Green background for success
+            colorText: Colors.white, // White text
+            snackPosition: SnackPosition.BOTTOM, // Position at the bottom
+          );
+          // Optionally update main user fields after successful update
           user.firstName.value = firstNameController.text;
           user.lastName.value = lastNameController.text;
-          user.email.value = emailController.text;
-          user.password.value = passwordController.text;  // Update password if needed
+          // user.email.value = emailController.text;
+          user.gender.value = gender.value; // Update password if needed
         } else {
-          Get.snackbar('Error', 'Failed to update profile');
+          Get.snackbar(
+            'Error',
+            'Failed to update profile',
+            backgroundColor: Colors.red, // Red background for error
+            colorText: Colors.white, // White text
+            snackPosition: SnackPosition.BOTTOM, // Position at the bottom
+          );
         }
       } catch (e) {
-        Get.snackbar('Error', 'An error occurred while updating the profile');
+        Get.snackbar(
+          'Error',
+          'An error occurred while updating the profile',
+          backgroundColor: Colors.red, // Red background for error
+          colorText: Colors.white, // White text
+          snackPosition: SnackPosition.BOTTOM, // Position at the bottom
+        );
       }
     } else {
       // If validation fails, show an error snackbar
-      Get.snackbar('Error', 'Please fix the errors');
+      Get.snackbar(
+        'Error',
+        'Please fix the errors',
+        backgroundColor: Colors.red, // Red background for error
+        colorText: Colors.white, // White text
+        snackPosition: SnackPosition.BOTTOM, // Position at the bottom
+      );
     }
   }
 
   // Validation method for the profile
   bool _validateProfile() {
     bool isValid = true;
+
     // Validate first name
     if (firstNameController.text.isEmpty) {
       firstNameError.value = 'First name is required';
@@ -82,6 +111,7 @@ var firstName = "".obs;
     } else {
       firstNameError.value = '';
     }
+
     // Validate last name
     if (lastNameController.text.isEmpty) {
       lastNameError.value = 'Last name is required';
@@ -89,6 +119,7 @@ var firstName = "".obs;
     } else {
       lastNameError.value = '';
     }
+
     // Validate email
     if (emailController.text.isEmpty || !GetUtils.isEmail(emailController.text)) {
       emailError.value = 'Please enter a valid email';
@@ -96,65 +127,80 @@ var firstName = "".obs;
     } else {
       emailError.value = '';
     }
-    // Validate password
-    if (passwordController.text.isEmpty) {
-      passwordError.value = 'Password is required';
-      isValid = false;
-    } else {
-      passwordError.value = '';
-    }
-    // Validate confirm password
-    if (confirmPasswordController.text.isEmpty) {
-      confirmPasswordError.value = 'Confirm password is required';
-      isValid = false;
-    } else if (passwordController.text != confirmPasswordController.text) {
-      confirmPasswordError.value = 'Passwords do not match';
-      isValid = false;
-    } else {
-      confirmPasswordError.value = '';
-    }
 
-     // Validate Gender
+    // Validate gender
     if (gender.value == 'Select Gender') {
       genderError.value = 'Gender is required';
       isValid = false;
     } else {
       genderError.value = '';
     }
+
     return isValid;
   }
 
   // Method to update the profile via API
   Future<bool> _updateUserProfile() async {
+    RxInt rxInt = 0.obs;
+
+    // Safe conversion with tryParse
+    int? parsedInt = int.tryParse(user.id.value);
+    if (parsedInt != null) {
+      rxInt.value = parsedInt; // Assign parsed value
+    } else {
+      print('Invalid integer format');
+    }
+
     try {
-      final response = await http.put(
-        Uri.parse('https://yourapi.com/updateProfile'), // Replace with your API endpoint
+      final response = await http.post(
+        Uri.parse(
+          '$httpHomeAutomation/EndUserController/CreateEndUser', // Replace with your API endpoint
+        ),
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer ${user.token.value}', // If required, add authentication token
+          // If required, add authentication token
         },
-        body: json.encode({
-          'firstName': firstNameController.text,
-          'lastName': lastNameController.text,
-          'email': emailController.text,
-          'password': passwordController.text,
-          'gender': user.gender.value,
-          'mobileNo': user.mobileNo.value,
+        body: jsonEncode({
+          "id": rxInt.value, // You can replace this with dynamic data
+          "name": user.name.value, // Replace with actual user data
+          "contact": user.mobileNo.value,
+          "firstName": firstNameController.text,
+          "lastName": lastNameController.text,
+          "gender": gender.value, // Using gender selected from the controller
+          "activeFlag": "Y",
         }),
       );
-
-      if (response.statusCode == 200) {
-        // If the update is successful, show success and update local user data
+      log(response.statusCode.toString());
+      if (response.statusCode == 208) {
         return true;
       } else {
-        // Show error snackbar if the update fails
-        Get.snackbar('Error', 'Failed to update profile. Try again.');
+        Get.snackbar(
+          'Error',
+          'Failed to update profile. Try again.',
+          backgroundColor: Colors.red, // Red background for error
+          colorText: Colors.white, // White text
+          snackPosition: SnackPosition.BOTTOM, // Position at the bottom
+        );
         return false;
       }
     } catch (e) {
       // Handle error if any
-      Get.snackbar('Error', 'An error occurred while updating the profile');
+      Get.snackbar(
+        'Error',
+        'An error occurred while updating the profile',
+        backgroundColor: Colors.red, // Red background for error
+        colorText: Colors.white, // White text
+        snackPosition: SnackPosition.BOTTOM, // Position at the bottom
+      );
       return false;
     }
+  }
+
+  // Method to clear the form fields
+  void clearUserFormFields() {
+    firstNameController.clear();
+    lastNameController.clear();
+    emailController.clear();
+    gender.value = '';
   }
 }

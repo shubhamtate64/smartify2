@@ -1,5 +1,7 @@
 import 'dart:convert';
+import 'dart:developer';
 
+import 'package:Smartify/view/login_screen.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import '../controller/login_screen_controller.dart';
@@ -50,9 +52,11 @@ class RegistrationController extends GetxController {
   RxString passcode = "".obs;
   RxBool isAdmin = true.obs;
   RxBool isOTPSent = false.obs;
+  RxString isotpres = ''.obs;
 
   var isPasswordVisible = false.obs;
-var isConfirmPasswordVisible = false.obs;
+var isConfirmPasswordVisible = false.obs; 
+RxBool isLoading = false.obs;
 
 
 
@@ -140,7 +144,7 @@ var isConfirmPasswordVisible = false.obs;
   }
 
   // Validate all fields at once
-  void validateAllFields() {
+  Future<void> validateAllFields() async {
     // Trigger validation for all fields
     validateFirstName(firstName.value);
     validateLastName(lastName.value);
@@ -150,16 +154,15 @@ var isConfirmPasswordVisible = false.obs;
     validateMobileNo(mobileNo.value);
     validateGender(selectedGender.value);
     validepasscode(passcode.value);
-    validateOTP(otp.value);
+    // validateOTP(otp.value);
   }
-
 void sendOTP() async {
-  validateEmail(email.value); // First validate email
+  validateEmail(email.value);
 
-  if (emailError.value.isNotEmpty) {
+  if (emailError.value.isNotEmpty || email.value.trim().isEmpty) {
     Get.snackbar(
       "Error",
-      "Please correct the errors before requesting OTP",
+      "Please enter a valid email before requesting OTP",
       snackPosition: SnackPosition.BOTTOM,
       backgroundColor: Colors.red,
       colorText: Colors.white,
@@ -167,39 +170,52 @@ void sendOTP() async {
     return;
   }
 
-  // isLoading.value = true;
+  isLoading.value = true; // Show loader
+  log("Sending OTP...");
 
   try {
     final response = await http.post(
-      Uri.parse('https://yourapi.com/sendOTP'), // 🔁 Replace with your actual endpoint
+      Uri.parse('$httpHomeAutomation/EndUserController/getOTP'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
-        "email": email.value,
-        // Optionally send mobile if your API requires it
-        // "mobile": mobileNo.value,
+        "email": email.value.trim(),
       }),
     );
 
     if (response.statusCode == 200) {
-      isOTPSent.value = true;
+      var data = jsonDecode(response.body);
+      if (data["otp"] != null) {
+        isotpres.value = data["otp"].toString();
+        isOTPSent.value = true;
 
-      Get.snackbar(
-        "OTP Sent",
-        "OTP has been successfully sent to your email/mobile",
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
-      );
+        Get.snackbar(
+          "OTP Sent",
+          "OTP has been successfully sent to your email",
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+        );
+      } else {
+        Get.snackbar(
+          "Failed",
+          "OTP not received from server. Please try again.",
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+      }
     } else {
+      log("Error response: ${response.body}");
       Get.snackbar(
         "Failed",
-        "Unable to send OTP. Please try again later.",
+        "Unable to send OTP. Server responded with ${response.statusCode}",
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );
     }
   } catch (e) {
+    log("Exception while sending OTP: $e");
     Get.snackbar(
       "Error",
       "An error occurred while sending OTP.",
@@ -208,7 +224,8 @@ void sendOTP() async {
       colorText: Colors.white,
     );
   } finally {
-    // isLoading.value = false;
+    isLoading.value = false; // Hide loader
+
   }
 }
 
@@ -216,9 +233,15 @@ void sendOTP() async {
   // Method to verify OTP
   
 void verifyOTP() async {
+
+      // log(otpController.text);
+      // log(isotpres.value = "1235");
+
   validateOTP(otp.value); // First validate the entered OTP
 
   if (otpError.value.isNotEmpty) {
+
+    otpError.value = "Please enter the OTP";
     Get.snackbar(
       "Error",
       "Please enter the OTP",
@@ -227,121 +250,151 @@ void verifyOTP() async {
       colorText: Colors.white,
     );
     return;
-  }
+  }else if(isotpres.value.trim() == otp.value.trim()){
 
-  // isLoading.value = true;
-
-  try {
-    final response = await http.post(
-      Uri.parse('https://yourapi.com/verifyOTP'), // 🔁 Replace with your actual endpoint
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({
-        "email": email.value,     // Pass email or mobile based on your API
-        "otp": otp.value.trim(),  // OTP entered by the user
-      }),
-    );
-
-    if (response.statusCode == 200) {
-      Get.snackbar(
+    otpError.value = "";
+        Get.snackbar(
         "Success",
         "OTP Verified Successfully",
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.green,
         colorText: Colors.white,
       );
-
-      // ✅ Optional: Set verification flag or navigate to next screen
-      // isOTPVerified.value = true;
-
-    } else {
-      Get.snackbar(
+  }else{
+      otpError.value ="Invalid OTP";
+    Get.snackbar(
         "Invalid OTP",
         "OTP verification failed. Please try again.",
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );
-    }
-  } catch (e) {
-    Get.snackbar(
-      "Error",
-      "Something went wrong. Please try again later.",
-      snackPosition: SnackPosition.BOTTOM,
-      backgroundColor: Colors.red,
-      colorText: Colors.white,
-    );
-  } finally {
-    // isLoading.value = false;
+
   }
+
+  // // isLoading.value = true;
+
+  // try {
+  //   final response = await http.post(
+  //     Uri.parse('https://yourapi.com/verifyOTP'), // 🔁 Replace with your actual endpoint
+  //     headers: {'Content-Type': 'application/json'},
+  //     body: jsonEncode({
+  //       "email": email.value,     // Pass email or mobile based on your API
+  //       "otp": otp.value.trim(),  // OTP entered by the user
+  //     }),
+  //   );
+
+  //   if (response.statusCode == 200) {
+  //     Get.snackbar(
+  //       "Success",
+  //       "OTP Verified Successfully",
+  //       snackPosition: SnackPosition.BOTTOM,
+  //       backgroundColor: Colors.green,
+  //       colorText: Colors.white,
+  //     );
+
+  //     // ✅ Optional: Set verification flag or navigate to next screen
+  //     // isOTPVerified.value = true;
+
+  //   } else {
+  //     Get.snackbar(
+  //       "Invalid OTP",
+  //       "OTP verification failed. Please try again.",
+  //       snackPosition: SnackPosition.BOTTOM,
+  //       backgroundColor: Colors.red,
+  //       colorText: Colors.white,
+  //     );
+  //   }
+  // } catch (e) {
+  //   Get.snackbar(
+  //     "Error",
+  //     "Something went wrong. Please try again later.",
+  //     snackPosition: SnackPosition.BOTTOM,
+  //     backgroundColor: Colors.red,
+  //     colorText: Colors.white,
+  //   );
+  // } finally {
+  //   // isLoading.value = false;
+  // }
 }
 
 
  
+Future<bool> register() async {
+  final isOnline = Get.find<ConnectivityService>().isOnline.value;
 
-  
-
-  // Register method (modified to handle HTTP POST)
-  Future<void> register() async {
-
-    final isOnline = Get.find<ConnectivityService>().isOnline.value;
-
-    if (!isOnline) {
-      Get.snackbar(
-        "No Internet",
-        "Please check your internet connection",
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-        snackPosition: SnackPosition.BOTTOM,
-      );
-      return;
-    }
-    // Validate all fields before proceeding with registration
-    validateAllFields();
-
-    // If there are no validation errors, proceed with registration
-    if (firstNameError.value.isEmpty &&
-        lastNameError.value.isEmpty &&
-        emailError.value.isEmpty &&
-        passwordError.value.isEmpty &&
-        confirmPasswordError.value.isEmpty &&
-        mobileNoError.value.isEmpty &&
-        genderError.value.isEmpty) {
-      
-      // Create a RegistrationModel instance
-      RegistrationModel registrationData = RegistrationModel(
-        firstName: firstName.value,
-        lastName: lastName.value,
-        email: email.value,
-        password: password.value,
-        mobileNo: mobileNo.value,
-        gender: selectedGender.value, 
-        
-        passcode: passcodeController.text.trim(),
-      );
-
-      // Perform the HTTP POST request
-      try {
-        var response = await http.post(
-         Uri.parse('$httpHomeAutomation/EndUserController/CreateEndUser'),  // Replace with your actual URL
-          headers: {"Content-Type": "application/json"},
-          body: json.encode(registrationData.toJson()),
-        );
-
-        if (response.statusCode == 200) {
-          // Handle success
-          Get.snackbar("Registration", "Registration successful", snackPosition: SnackPosition.BOTTOM);
-        } else {
-          // Handle error
-          Get.snackbar("Error", "Registration failed: ${response.body}", snackPosition: SnackPosition.BOTTOM);
-        }
-      } catch (e) {
-        // Handle error
-        Get.snackbar("Error", "An error occurred: $e", snackPosition: SnackPosition.BOTTOM);
-      }
-    } else {
-      Get.snackbar("Error", "Please correct the errors in the form", snackPosition: SnackPosition.BOTTOM);
-    }
+  if (!isOnline) {
+    Get.snackbar(
+      "No Internet",
+      "Please check your internet connection",
+      backgroundColor: Colors.red,
+      colorText: Colors.white,
+      snackPosition: SnackPosition.BOTTOM,
+    );
+    return false;
   }
+
+  // Validate all fields before proceeding with registration
+  await validateAllFields();
+
+  if (firstNameError.value.isEmpty &&
+      lastNameError.value.isEmpty &&
+      emailError.value.isEmpty &&
+      passwordError.value.isEmpty &&
+      confirmPasswordError.value.isEmpty &&
+      mobileNoError.value.isEmpty &&
+      genderError.value.isEmpty) {
+
+    // Create RegistrationModel instance
+    RegistrationModel registrationData = RegistrationModel(
+      firstName: firstName.value,
+      lastName: lastName.value,
+      email: email.value,
+      password: password.value,
+      mobileNo: mobileNo.value,
+      gender: selectedGender.value,
+      passcode: passcodeController.text.trim(),
+    );
+
+    isLoading.value = true;
+
+    try {
+      var response = await http.post(
+        Uri.parse('$httpHomeAutomation/EndUserController/CreateEndUser'),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode(registrationData.toJson()),
+      );
+
+      if (response.statusCode == 201) {
+        // Handle success
+        clearTextControllers();
+
+        // Show snackbar before navigating
+        Get.snackbar("Registration", "Registration successful", snackPosition: SnackPosition.BOTTOM);
+
+        // Delay the navigation to give snackbar time to show
+        Future.delayed(Duration(seconds: 2), () {
+          // Navigate to the Login page after the snackbar is displayed
+          Get.off(() => LoginScreen()); // Replace with your actual LoginPage class
+        });
+
+        return true;
+      } else {
+        log("Registration failed: ${response.body}");
+        Get.snackbar("Error", "Registration failed: ${response.body}", snackPosition: SnackPosition.BOTTOM);
+        return false;
+      }
+    } catch (e) {
+      Get.snackbar("Error", "An error occurred: $e", snackPosition: SnackPosition.BOTTOM);
+      return false;
+    } finally {
+      isLoading.value = false;
+    }
+  } else {
+    Get.snackbar("Error", "Please correct the errors in the form", snackPosition: SnackPosition.BOTTOM);
+    return false;
+  }
+}
 
 
   //   // Method to validate the form
@@ -448,6 +501,7 @@ void clearTextControllers() {
   confirmPasswordController.clear();
   mobileNoController.clear();
   otpController.clear();
+  passcodeController.clear();
 }
 
 

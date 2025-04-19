@@ -39,9 +39,10 @@ class ProfileView extends StatelessWidget {
                   },
                   decoration: InputDecoration(
                     labelText: "First Name",
-                    errorText: profileController.firstNameError.value.isEmpty
-                        ? null
-                        : profileController.firstNameError.value,
+                    errorText:
+                        profileController.firstNameError.value.isEmpty
+                            ? null
+                            : profileController.firstNameError.value,
                     border: OutlineInputBorder(),
                   ),
                 );
@@ -57,9 +58,10 @@ class ProfileView extends StatelessWidget {
                   },
                   decoration: InputDecoration(
                     labelText: "Last Name",
-                    errorText: profileController.lastNameError.value.isEmpty
-                        ? null
-                        : profileController.lastNameError.value,
+                    errorText:
+                        profileController.lastNameError.value.isEmpty
+                            ? null
+                            : profileController.lastNameError.value,
                     border: OutlineInputBorder(),
                   ),
                 );
@@ -70,33 +72,37 @@ class ProfileView extends StatelessWidget {
               Obx(() {
                 return TextField(
                   controller: profileController.emailController,
-                  onChanged: (value) {
-                    profileController.email.value = value;
-                  },
+                  readOnly: true, // 👈 This makes the field non-editable
                   decoration: InputDecoration(
                     labelText: "Email",
-                    errorText: profileController.emailError.value.isEmpty
-                        ? null
-                        : profileController.emailError.value,
+                    errorText:
+                        profileController.emailError.value.isEmpty
+                            ? null
+                            : profileController.emailError.value,
                     border: OutlineInputBorder(),
                   ),
                 );
               }),
+
               SizedBox(height: 10),
 
               // Gender Dropdown
               Obx(() {
                 return DropdownButton<String>(
-                  value: profileController.gender.value == "Select Gender"
-                      ? null
-                      : profileController.gender.value,
+                  value:
+                      profileController.gender.value == "Select Gender"
+                          ? null
+                          : profileController.gender.value,
                   hint: Text("Select Gender"),
-                  items: ["Male", "Female"]
-                      .map((gender) => DropdownMenuItem<String>(
-                            value: gender,
-                            child: Text(gender),
-                          ))
-                      .toList(),
+                  items:
+                      ["Male", "Female"]
+                          .map(
+                            (gender) => DropdownMenuItem<String>(
+                              value: gender,
+                              child: Text(gender),
+                            ),
+                          )
+                          .toList(),
                   onChanged: (String? newValue) {
                     profileController.gender.value = newValue!;
                   },
@@ -112,43 +118,45 @@ class ProfileView extends StatelessWidget {
               }),
               SizedBox(height: 10),
 
-              // Password
-              Obx(() {
-                return TextField(
-                  controller: profileController.passwordController,
-                  obscureText: true,
-                  onChanged: (value) {
-                    profileController.password.value = value;
-                  },
-                  decoration: InputDecoration(
-                    labelText: "Password",
-                    errorText: profileController.passwordError.value.isEmpty
-                        ? null
-                        : profileController.passwordError.value,
-                    border: OutlineInputBorder(),
-                  ),
-                );
-              }),
-              SizedBox(height: 10),
+              // // Password
+              // Obx(() {
+              //   return TextField(
+              //     controller: profileController.passwordController,
+              //     obscureText: true,
+              //     onChanged: (value) {
+              //       profileController.password.value = value;
+              //     },
+              //     decoration: InputDecoration(
+              //       labelText: "Password",
+              //       errorText:
+              //           profileController.passwordError.value.isEmpty
+              //               ? null
+              //               : profileController.passwordError.value,
+              //       border: OutlineInputBorder(),
+              //     ),
+              //   );
+              // }),
+              // SizedBox(height: 10),
 
-              // Confirm Password
-              Obx(() {
-                return TextField(
-                  controller: profileController.confirmPasswordController,
-                  obscureText: true,
-                  onChanged: (value) {
-                    profileController.confirmPassword.value = value;
-                  },
-                  decoration: InputDecoration(
-                    labelText: "Confirm Password",
-                    errorText: profileController.confirmPasswordError.value.isEmpty
-                        ? null
-                        : profileController.confirmPasswordError.value,
-                    border: OutlineInputBorder(),
-                  ),
-                );
-              }),
-              SizedBox(height: 20),
+              // // Confirm Password
+              // Obx(() {
+              //   return TextField(
+              //     controller: profileController.confirmPasswordController,
+              //     obscureText: true,
+              //     onChanged: (value) {
+              //       profileController.confirmPassword.value = value;
+              //     },
+              //     decoration: InputDecoration(
+              //       labelText: "Confirm Password",
+              //       errorText:
+              //           profileController.confirmPasswordError.value.isEmpty
+              //               ? null
+              //               : profileController.confirmPasswordError.value,
+              //       border: OutlineInputBorder(),
+              //     ),
+              //   );
+              // }),
+              // SizedBox(height: 20),
 
               // Save Button
               ElevatedButton(

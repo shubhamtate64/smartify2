@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:Smartify/main.dart';
 import 'package:Smartify/services/connectivity_service.dart';
@@ -99,7 +100,7 @@ class _RoomViewState extends State<RoomView>  with WidgetsBindingObserver, Route
   void _startAutoRefresh() {
     _stopAutoRefresh(); // ensure only one timer runs
     print("⏱️ Starting timer");
-    _timer = Timer.periodic(Duration(seconds: 2), (timer) {
+    _timer = Timer.periodic(Duration(seconds:2), (timer) {
       if (mounted && connectivityService.isOnline.value) {
         controller.GetDeviceLiveStatus();
         print("Fetching live status...");
@@ -200,9 +201,13 @@ class _RoomViewState extends State<RoomView>  with WidgetsBindingObserver, Route
                       childAspectRatio: 1,
                     ),
                     delegate: SliverChildBuilderDelegate((context, index) {
-                      Device device = widget.room.devices[index];
 
-                      if (device.iconName.toLowerCase() == "fan" || device.deviceName.toLowerCase() == "fan") {
+                      Device device = widget.room.devices[index];
+                      bool val = device.status.contains("on");
+                    
+                      
+
+                      if (device.iconName.toLowerCase() == "fan" ) {//|| device.deviceName.toLowerCase() == "fan"
                         return GestureDetector(
                           onTap: () {
                             Get.dialog(

@@ -20,13 +20,14 @@ class RegistrationModel {
   // Convert RegistrationModel to JSON
   Map<String, dynamic> toJson() {
     return {
-      'first_name': firstName,
-      'last_name': lastName,
+      'firstName': firstName,
+      'lastName': lastName,
       'email': email,
       'password': password,
-      'mobile_no': mobileNo,
+      'contact': mobileNo,
       'gender': gender,
-       'passcode': passcode,
+      'passcode': passcode,
+      "name":"abcd"
     };
   }
 

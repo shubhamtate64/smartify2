@@ -47,6 +47,8 @@ class HomeController extends GetxController {
    Timer? timer;  // Loading state// Reactive variable for room name error
   LoginController loginController = Get.find<LoginController>();
 
+  RxBool isOnOFF = false.obs;
+
   // Define room types and their corresponding icons
   Map<String, IconData> roomIcons = {
     'Bedroom': Icons.bed,
@@ -96,6 +98,8 @@ class HomeController extends GetxController {
 //   }
 
   Future<void> getAllRoomsData() async {
+
+    log("getAllRooms");
   try {
      isLoading(true);      // Loading state
      final response = await http.get(
@@ -149,8 +153,10 @@ class HomeController extends GetxController {
     if (response.statusCode == 200) {
       List jsonResponse = json.decode(response.body);
 
+      log(jsonResponse.toString());
+
       if (jsonResponse.isEmpty) {
-        Get.snackbar("Error", "Empty response from server");
+        // Get.snackbar("Error", "Empty response from server");
         return;
       }
 
@@ -198,25 +204,24 @@ Future<void> GetDeviceLiveStatus() async {
           int roomId = roomStatus['id']; // Get the roomId
           
           Room? room = rooms.firstWhere((room) => room.id == roomId,);
+          room.roomStatus.value = roomStatus["status"];
+          log(room.roomStatus.value);
 
-          if (room != null) {
-            // Loop through the room's deviceList and update the device status
-            for (var deviceStatus in roomStatus['deviceStatusList']) {
-              Device? device = room.devices.firstWhere(
-                  (device) => device.id == deviceStatus['id'],
-                  );
+          // Loop through the room's deviceList and update the device status
+          for (var deviceStatus in roomStatus['deviceStatusList']) {
+            Device? device = room.devices.firstWhere(
+                (device) => device.id == deviceStatus['id'],
+                );
 
-              if (device != null) {
-                // Update device status
-                device.status.value = deviceStatus['status'];
-                log("${device.status.value}");
-                refresh();
-              }
-            }
-          } else {
-            print("No room found with ID: $roomId");
-          }
-        } catch (e) {
+            // Update device status
+            device.status.value = deviceStatus['status'];
+            
+
+            log("${device.status.value}");
+            update();
+            refresh();
+                      }
+                } catch (e) {
           print("Error processing device status for room: $e");
         }
       }
@@ -224,7 +229,7 @@ Future<void> GetDeviceLiveStatus() async {
       Get.snackbar("Error", "Failed to load device status: ${response.statusCode}");
     }
   } catch (e) {
-    Get.snackbar("Error", "Exception: $e");
+    // Get.snackbar("Error", "Exception: $e");
   } finally {
     isLoading(false);
   }
@@ -489,7 +494,8 @@ Future<void> restoreUser(String userId) async {
     );
 
     // Add to local list
-     bool  val = await sendRoomToServer(newRoom, roomType);
+    //  bool  val = await sendRoomToServer(newRoom, roomType);
+      bool  val = true;
      
      if(val) {
        rooms.add(newRoom);
@@ -560,7 +566,8 @@ Future<bool> sendRoomToServer(Room room, String roomType) async {
 );
 
 
-  final bool isSuccess = await sendDeviceToServer(newDevice);
+  // final bool isSuccess = await sendDeviceToServer(newDevice);
+  final bool isSuccess = true;
 
   if (isSuccess) {
     room.devices.add(newDevice);
@@ -572,14 +579,15 @@ Future<bool> sendRoomToServer(Room room, String roomType) async {
       backgroundColor: Colors.green,
       colorText: Colors.white,
     );
-  } else {
-    Get.snackbar(
-      "Error",
-      "Failed to add device",
-      backgroundColor: Colors.red,
-      colorText: Colors.white,
-    );
   }
+  // } else {
+  //   Get.snackbar(
+  //     "Error",
+  //     "Failed to add device",
+  //     backgroundColor: Colors.red,
+  //     colorText: Colors.white,
+  //   );
+  // }
 }
 
 Future<bool> sendDeviceToServer(Device device) async {
@@ -639,7 +647,8 @@ Future<bool> sendDeviceToServer(Device device) async {
 
 
  void toggleDeviceState(Device device) async {
-  String actionCommand = device.status.value == "OFF" ? device.action[0] : device.action[1]; 
+  String actionCommand = device.status.value.toUpperCase() == "OFF" ? device.action[0] : device.action[1]; 
+  // String actionCommand = isOnOFF.value  ? device.action[0] : device.action[1]; 
 
   // Call API to update status using action command
   bool success = await updateDeviceStatus(device.id, actionCommand);
@@ -656,6 +665,7 @@ Future<bool> sendDeviceToServer(Device device) async {
 }
 
 Future<bool> updateDeviceStatus(int deviceId, String actionCommand) async {
+
   try {
     final response = await http.post(
       Uri.parse('$httpHomeAutomation/MstDeviceController/updateHardware'),
@@ -678,20 +688,42 @@ Future<bool> updateDeviceStatus(int deviceId, String actionCommand) async {
     return false;
   }
 }
-
 void updateFanState(Device device, String newState) async {
+  // log("Updating fan state for device: ${device.deviceName}");
+  // log("Old Status: ${device.status.value}");
+  // log("New Status: $newState");
+
   bool success = await updateDeviceStatus(device.id, newState);
 
   if (success) {
     device.status.value = newState;
-    update();
+    // log("Status after update: ${device.status.value}");
+
+    // Optional if using Obx: update(); refresh(); not needed usually
   } else {
-    Get.snackbar("Error", "Failed to update fan state", backgroundColor: Colors.red, colorText: Colors.white);
+    Get.snackbar(
+      "Error", 
+      "Failed to update fan state",
+      backgroundColor: Colors.red, 
+      colorText: Colors.white
+    );
   }
 }
 
 
 
+// void toggleSwitch(Device device,bool value){
+
+//     if(device.status.value.contains("on")){
+//        isOnOFF.value =  value;
+//     }else{
+//       isOnOFF.value = value;
+//     }
+
+//     update();
+//     refresh();
+
+//   }
 
 
 }
