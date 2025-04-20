@@ -79,8 +79,8 @@ class LoginController extends GetxController {
   // }
 
   void login() {
-    emailController.text = "admin1@gmail.com"; // Default values for testing
-    passwordController.text = "1234";
+    // emailController.text = "admin1@gmail.com"; // Default values for testing
+    // passwordController.text = "1234";
 
     validatePassword(passwordController.text.trim());
     validateEmail(emailController.text.trim());
