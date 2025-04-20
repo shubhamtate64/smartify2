@@ -20,7 +20,9 @@ class MyDrawer extends StatelessWidget {
           // Dynamic User Header
           Obx(() {
             final user = loginController.mainUser;
-            final name = "${user?.firstName.value ?? 'Guest'} ${user?.lastName.value ?? ''}".trim();
+            final name =
+                "${user?.firstName.value ?? 'Guest'} ${user?.lastName.value ?? ''}"
+                    .trim();
             final email = user?.email.value ?? "No Email";
             final gender = user?.gender.value ?? "other";
 
@@ -35,7 +37,10 @@ class MyDrawer extends StatelessWidget {
               ),
               accountEmail: Text(
                 email.isEmpty ? "No Email" : email,
-                style: GoogleFonts.aDLaMDisplay(fontSize: 16, color: Colors.white),
+                style: GoogleFonts.aDLaMDisplay(
+                  fontSize: 16,
+                  color: Colors.white,
+                ),
               ),
               currentAccountPicture: CircleAvatar(
                 backgroundColor: Colors.white,
@@ -48,7 +53,10 @@ class MyDrawer extends StatelessWidget {
           _buildDrawerItem(
             icon: Icons.person,
             text: "Profile",
-            onTap: () => Get.to(() => ProfileView()),
+            onTap: () {
+              Get.back();
+              Get.to(() => ProfileView());
+            },
           ),
 
           // Show Users option only for admin roles
@@ -56,10 +64,13 @@ class MyDrawer extends StatelessWidget {
             final role = loginController.mainUser?.role.value ?? '';
             return (role == '1' || role == '2')
                 ? _buildDrawerItem(
-                    icon: Icons.person_add,
-                    text: "Users",
-                    onTap: () => Get.to(() => UserListScreen()),
-                  )
+                  icon: Icons.person_add,
+                  text: "Users",
+                  onTap: () {
+                    Get.back();
+                    Get.to(() => UserListScreen());
+                  },
+                )
                 : SizedBox();
           }),
 
@@ -82,11 +93,21 @@ class MyDrawer extends StatelessWidget {
   Widget _getUserAvatar(String gender) {
     if (gender.toLowerCase() == "male") {
       return ClipOval(
-        child: Image.asset('assets/MaleAvtar.png', width: 60, height: 60, fit: BoxFit.cover),
+        child: Image.asset(
+          'assets/MaleAvtar.png',
+          width: 60,
+          height: 60,
+          fit: BoxFit.cover,
+        ),
       );
     } else if (gender.toLowerCase() == "female") {
       return ClipOval(
-        child: Image.asset('assets/FemaleAvtar.png', width: 60, height: 60, fit: BoxFit.cover),
+        child: Image.asset(
+          'assets/FemaleAvtar.png',
+          width: 60,
+          height: 60,
+          fit: BoxFit.cover,
+        ),
       );
     } else {
       return Icon(Icons.person, color: Colors.black, size: 40);
@@ -94,7 +115,11 @@ class MyDrawer extends StatelessWidget {
   }
 
   // Drawer item builder with custom font
-  Widget _buildDrawerItem({required IconData icon, required String text, required VoidCallback onTap}) {
+  Widget _buildDrawerItem({
+    required IconData icon,
+    required String text,
+    required VoidCallback onTap,
+  }) {
     return ListTile(
       leading: Icon(icon, color: Colors.black),
       title: Text(

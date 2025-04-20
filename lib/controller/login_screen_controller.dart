@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:Smartify/view/notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../httplocalhost/httpglobal.dart';
@@ -78,8 +79,8 @@ class LoginController extends GetxController {
   // }
 
   void login() {
-    emailController.text = "shubhamtate70@gmail.com"; // Default values for testing
-    passwordController.text = "12345";
+    emailController.text = "admin1@gmail.com"; // Default values for testing
+    passwordController.text = "1234";
 
     validatePassword(passwordController.text.trim());
     validateEmail(emailController.text.trim());
@@ -101,44 +102,67 @@ class LoginController extends GetxController {
       loginUser(emailController.text.trim(), passwordController.text.trim());
     }
   }
+Future<void> loginUser(String email, String password) async {
+  try {
+    isLoading(true); // Start loading
 
-  Future<void> loginUser(String email, String password) async {
-    ///textting pur
-    // Get.offAll(HomePage());
-    try {
-      isLoading(true);
+    // Initialize and get FCM token
+    final token = await Notifications().initNotifications();
+    if (token == null) {
+      Get.snackbar("Error", "Failed to get notification token",
+          backgroundColor: Colors.red, colorText: Colors.white);
+      return;
+    }
 
-      var response = await http.post(
-        Uri.parse(
-            '$httpHomeAutomation/LoginController/Admin/login'), // Replace with your API endpoint
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode({"email": email, "password": password}),
-      );
+    // API Call
+    final response = await http.post(
+      Uri.parse('$httpHomeAutomation/LoginController/Admin/login'),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({
+        "email": email,
+        "password": password,
+        "token": token,
+      }),
+    );
 
-      log('${json.decode(response.body)}');
-      log('${response.statusCode}');
+    // Debug logs
+    log('${response.statusCode}');
+    log(response.body);
 
-      if (response.statusCode == 200) {
-        var data = json.decode(response.body);
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
 
-        if (data['token'].isNotEmpty) {
-          mainUser = MainUser.fromJson(data);
-          
-          Get.offAll(
-              () => HomePage()); // Navigate to HomePage
-        } else {
-          Get.snackbar("Login Failed", "Invalid email or password",
-              backgroundColor: Colors.red, colorText: Colors.white);
+      // Handle error message from response
+      if (data is Map<String, dynamic> && data.containsKey('message')) {
+        if (data['message'] == "Invalid Email....!!") {
+          emailError.value = "Invalid Email";
+        } else if(data['message'] == "Your request still pending"){
+          Get.snackbar("Login Failed", "Your request still pending",
+            backgroundColor: Colors.red, colorText: Colors.white);
+        }else {
+          passwordError.value = "Invalid Password";
         }
+        return;
+      }
+
+      // Successful login
+      if (data['token'] != null && data['token'].toString().isNotEmpty) {
+        mainUser = MainUser.fromJson(data);
+        Get.offAll(() => HomePage()); // Navigate to home
       } else {
-        Get.snackbar("Error", "Server Error: ${response.statusCode}",
+        Get.snackbar("Login Failed", "Invalid email or password",
             backgroundColor: Colors.red, colorText: Colors.white);
       }
-    } catch (e) {
-      Get.snackbar("message", "Your request still pending",
+    } else {
+      Get.snackbar("Server Error", "Error: ${response.statusCode}",
           backgroundColor: Colors.red, colorText: Colors.white);
-    } finally {
-      isLoading(false);
     }
+  } catch (e) {
+    Get.snackbar("Error", "Something went wrong. Please try again.",
+        backgroundColor: Colors.red, colorText: Colors.white);
+    log("Login Exception: $e");
+  } finally {
+    isLoading(false); // Stop loading
   }
+}
 }

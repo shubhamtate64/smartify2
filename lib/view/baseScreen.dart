@@ -18,7 +18,7 @@ class BaseScreen extends StatelessWidget {
       // Check if rooms list is not empty and get statusRoom
       final hasRooms = homeController.rooms.isNotEmpty;
       final isRoomOffline = hasRooms
-          ? homeController.rooms[0].roomStatus.value.toLowerCase() ==  "offline"//"offline"
+          ? homeController.rooms[0].roomStatus.value.toLowerCase() ==  "online"//"offline"
           : false;
 
       final shouldShowOverlay = isOffline || isRoomOffline;

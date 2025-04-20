@@ -17,6 +17,7 @@ class ProfileController extends GetxController {
   var emailController = TextEditingController();
   var passwordController = TextEditingController();
   var confirmPasswordController = TextEditingController();
+  var PassCodeController = TextEditingController();
 
   // Observable error fields
   var firstNameError = "".obs;
@@ -31,6 +32,7 @@ class ProfileController extends GetxController {
   var email = "".obs;
   var password = "".obs;
   var confirmPassword = "".obs;
+  var passCode = "".obs;
   var gender = 'Select Gender'.obs;
 
   @override
@@ -41,6 +43,7 @@ class ProfileController extends GetxController {
     lastNameController.text = user.lastName.value;
     emailController.text = user.email.value;
     gender.value = user.gender.value;
+    PassCodeController.text = user.passcode.value;
   }
 
   // Method to validate the fields and update the profile

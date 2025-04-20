@@ -9,41 +9,46 @@ class FanSpeedControl extends StatelessWidget {
   const FanSpeedControl({required this.device, Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    final HomeController controller = Get.find<HomeController>();
-    final List<String> fanSpeeds = device.action;
+Widget build(BuildContext context) {
+  final HomeController controller = Get.find<HomeController>();
+  final List<String> fanSpeeds = device.action;
+
+  return Obx(() {
+    final currentSpeed = controller.fanTempSpeed.value.isNotEmpty
+        ? controller.fanTempSpeed.value
+        : device.status.value;
 
     return Wrap(
       spacing: 12,
       runSpacing: 12,
       children: fanSpeeds.map((speed) {
-        return Obx(() {
-          final bool isSelected = device.status.value == speed;
+        final bool isSelected = currentSpeed == speed;
 
-          return ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor:
-                  isSelected ? Colors.blueAccent : Colors.grey[300],
-              foregroundColor: isSelected ? Colors.white : Colors.black,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
+        return ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor:
+                isSelected ? Colors.blueAccent : Colors.grey[300],
+            foregroundColor: isSelected ? Colors.white : Colors.black,
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
             ),
-            onPressed: () {
-              if (!isSelected) {
-                controller.updateFanState(device, speed);
-              }
-            },
-            child: Text(
-              isSelected
-                  ? '${speed.split('_').last.capitalize!} (Current)'
-                  : speed.split('_').last.capitalize!,
-              style: const TextStyle(fontSize: 16),
-            ),
-          );
-        });
+          ),
+          onPressed: () {
+            if (!isSelected) {
+              controller.updateFanState(device, speed);
+            }
+          },
+          child: Text(
+            isSelected
+                ? '${speed.split('_').last.capitalize!} (Current)'
+                : speed.split('_').last.capitalize!,
+            style: const TextStyle(fontSize: 16),
+          ),
+        );
       }).toList(),
     );
-  }
+  });
+}
+
 }

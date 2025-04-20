@@ -48,18 +48,32 @@ class NotificationPage extends StatelessWidget {
         double padding = screenWidth * 0.05;
 
         return Scaffold(
-          backgroundColor: Colors.white,
+          backgroundColor:  Colors.grey[300],
           appBar: AppBar(
             title: Text(
               "Notifications",
-              style: GoogleFonts.poppins( // ✅ Updated
+              style: GoogleFonts.aDLaMDisplayTextTheme().titleLarge?.copyWith( // Use headline6 or another appropriate style
                 fontWeight: FontWeight.w700,
                 fontSize: baseFont + 2,
+                color: Colors.black, // ✅ Set text color to black
               ),
             ),
           ),
-          body: Obx(
-            () => ListView.builder(
+          body: Obx(() {
+            if (controller.list.isEmpty) {
+              return Center(
+                child: Text(
+                  "No notifications available.",
+                  style: GoogleFonts.aDLaMDisplayTextTheme().bodyLarge?.copyWith( // Use bodyText1 or another appropriate style
+                    fontSize: baseFont,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.black, // ✅ Set text color to black
+                  ),
+                ),
+              );
+            }
+
+            return ListView.builder(
               itemCount: controller.list.length,
               itemBuilder: (context, index) {
                 return getSingleContainer(
@@ -71,8 +85,8 @@ class NotificationPage extends StatelessWidget {
                   baseFont,
                 );
               },
-            ),
-          ),
+            );
+          }),
         );
       },
     );
@@ -91,9 +105,10 @@ class NotificationPage extends StatelessWidget {
         Get.defaultDialog(
           title: title,
           backgroundColor: colorsList[index % 4],
-          titleStyle: GoogleFonts.poppins(
+          titleStyle: GoogleFonts.aDLaMDisplayTextTheme().titleLarge?.copyWith( // Use headline6 or another appropriate style
             fontWeight: FontWeight.bold,
             fontSize: fontSize + 2,
+            color: Colors.black, // ✅ Set text color to black
           ),
           content: Padding(
             padding: const EdgeInsets.all(8.0),
@@ -101,18 +116,20 @@ class NotificationPage extends StatelessWidget {
               children: [
                 Text(
                   description,
-                  style: GoogleFonts.poppins( // ✅ Updated
+                  style: GoogleFonts.aDLaMDisplayTextTheme().bodyLarge?.copyWith( // Use bodyText1 or another appropriate style
                     fontSize: fontSize,
                     fontWeight: FontWeight.w500,
+                    color: Colors.black, // ✅ Set text color to black
                   ),
                 ),
                 Align(
                   alignment: Alignment.bottomRight,
                   child: Text(
                     datetime(date),
-                    style: GoogleFonts.poppins( // ✅ Updated
+                    style: GoogleFonts.aDLaMDisplayTextTheme().bodyLarge?.copyWith( // Use bodyText1 or another appropriate style
                       fontSize: fontSize,
                       fontWeight: FontWeight.w600,
+                      color: Colors.black, // ✅ Set text color to black
                     ),
                   ),
                 ),
@@ -125,7 +142,7 @@ class NotificationPage extends StatelessWidget {
         margin: EdgeInsets.symmetric(horizontal: padding, vertical: 10),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: colorsList[index % 4],
+          color: Colors.white, // ✅ White color for the container
           borderRadius: BorderRadius.circular(12),
           boxShadow: const [
             BoxShadow(
@@ -145,16 +162,18 @@ class NotificationPage extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: GoogleFonts.poppins( // ✅ Updated
+                  style: GoogleFonts.aDLaMDisplayTextTheme().titleLarge?.copyWith( // Use headline6 or another appropriate style
                     fontSize: fontSize + 2,
                     fontWeight: FontWeight.w800,
+                    color: Colors.black, // ✅ Set text color to black
                   ),
                 ),
                 Text(
                   "${datetime2(date)} ${datetime(date)}",
-                  style: GoogleFonts.poppins( // ✅ Updated
+                  style: GoogleFonts.aDLaMDisplayTextTheme().bodyLarge?.copyWith( // Use bodyText1 or another appropriate style
                     fontSize: fontSize,
                     fontWeight: FontWeight.w700,
+                    color: Colors.black, // ✅ Set text color to black
                   ),
                 ),
               ],
@@ -162,9 +181,10 @@ class NotificationPage extends StatelessWidget {
             const SizedBox(height: 5),
             Text(
               description,
-              style: GoogleFonts.poppins( // ✅ Updated
+              style: GoogleFonts.aDLaMDisplayTextTheme().bodyLarge?.copyWith( // Use bodyText1 or another appropriate style
                 fontSize: fontSize,
                 fontWeight: FontWeight.w500,
+                color: Colors.black, // ✅ Set text color to black
               ),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,

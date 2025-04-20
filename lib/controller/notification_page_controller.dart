@@ -13,7 +13,7 @@ class NotificationPageController extends GetxController {
 
   void getNotifications() async {
     try {
-      Uri url = Uri.parse('$httpHomeAutomation/MstRoomController/getAll');
+      Uri url = Uri.parse('$httpHomeAutomation/');
 
 
       final response = await http.get(

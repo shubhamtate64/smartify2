@@ -30,7 +30,7 @@ class _HomePageState extends State<HomePage>
   final notificationPageController = Get.put(NotificationPageController());
   final ConnectivityService connectivityService =
       Get.find<ConnectivityService>();
-  final weatherController = Get.find<WeatherController>();
+  var weatherController;
 
   final notificationCount = 5.obs;
 
@@ -39,6 +39,7 @@ class _HomePageState extends State<HomePage>
   @override
   void initState() {
     super.initState();
+    weatherController = Get.put(WeatherController());
 
     // WidgetsBinding.instance.addObserver(this);
 
@@ -404,92 +405,88 @@ SliverToBoxAdapter(
 
 
 
-
-                // SliverAppBar and other UI code (no changes)
-                SliverPadding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                  sliver: SliverGrid(
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: screenWidth > 800
-                          ? 4
-                          : screenWidth > 500
-                              ? 3
-                              : 2,
-                      crossAxisSpacing: 16,
-                      mainAxisSpacing: 16,
-                      childAspectRatio: 1,
-                    ),
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                        return GestureDetector(
-                          onTap: () {
-                            Get.to(
-                              () => RoomView(room: controller.rooms[index]),
-                            );
-                            //  Get.to(() => RoomView(room: controller.rooms[index]));
-                          },
-                          child: Container(
-                            padding: EdgeInsets.all(screenWidth * 0.04),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(20),
-                              // border: Border.all(color: Colors.black,width: 2),
-                              // boxShadow: [
-                              //   BoxShadow(
-                              //     color: Colors.black12,
-                              //     blurRadius: 20,
-                              //     spreadRadius: 5,
-                              //     offset: const Offset(2, 4),
-                              //   ),
-                              // ],
-                            ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                // Use the appropriate icon based on the room type
-                                Icon(
-                                  controller.rooms[index].icon,
-                                  size: screenWidth * 0.15,
-                                  color: Colors.black,
-                                ),
-                                const SizedBox(height: 10),
-                                Text(
-                                  controller.rooms[index].name,
-                                  style: GoogleFonts.poppins(
-                                    fontSize: screenWidth * 0.045,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.black,
-                                  ),
-
-                                  softWrap: true,
-                                  textAlign: TextAlign.center,
-                                  maxLines: 1,
-                                  // overflowReplacement: const  Text('Sorry this Name too long'),
-                                ),
-
-                                const SizedBox(height: 10),
-
-                                Text(
-                                  "devices ${controller.rooms[index].devices.length}"
-                                      .toLowerCase(),
-                                  style: GoogleFonts.poppins(
-                                    fontSize: screenWidth * 0.045,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.black,
-                                  ),
-                                  maxLines: 1,
-                                  textAlign: TextAlign.center,
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
-                      },
-                      childCount: controller.rooms.length,
-                    ),
+SliverPadding(
+  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+  sliver: controller.rooms.isEmpty
+      ? SliverToBoxAdapter(
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                'No rooms available',
+                style: TextStyle(
+                  fontSize: screenWidth * 0.05,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey[600],
+                ),
+              ),
+            ),
+          ),
+        )
+      : SliverGrid(
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: screenWidth > 800
+                ? 4
+                : screenWidth > 500
+                    ? 3
+                    : 2,
+            crossAxisSpacing: 16,
+            mainAxisSpacing: 16,
+            childAspectRatio: 1,
+          ),
+          delegate: SliverChildBuilderDelegate(
+            (context, index) {
+              return GestureDetector(
+                onTap: () {
+                  Get.to(() => RoomView(room: controller.rooms[index]));
+                },
+                child: Container(
+                  padding: EdgeInsets.all(screenWidth * 0.04),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        controller.rooms[index].icon,
+                        size: screenWidth * 0.15,
+                        color: Colors.black,
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        controller.rooms[index].name,
+                        style: GoogleFonts.poppins(
+                          fontSize: screenWidth * 0.045,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black,
+                        ),
+                        softWrap: true,
+                        textAlign: TextAlign.center,
+                        maxLines: 1,
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        "Devices ${controller.rooms[index].devices.length}",
+                        style: GoogleFonts.poppins(
+                          fontSize: screenWidth * 0.045,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black,
+                        ),
+                        maxLines: 1,
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
                   ),
                 ),
+              );
+            },
+            childCount: controller.rooms.length,
+          ),
+        ),
+),
+
               ],
             )),
       ),

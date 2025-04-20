@@ -84,6 +84,19 @@ class ProfileView extends StatelessWidget {
                 );
               }),
 
+              const SizedBox(height: 10,),
+               // Email
+               TextField(
+                  controller: profileController.PassCodeController,
+                  readOnly: true, // 👈 This makes the field non-editable
+                  decoration: InputDecoration(
+                    labelText: "PassCode",
+                    
+                    border: OutlineInputBorder(),
+                  ),
+                
+              ),
+
               SizedBox(height: 10),
 
               // Gender Dropdown

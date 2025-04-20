@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:math';
+import 'dart:developer';
 
 import 'package:Smartify/main.dart';
 import 'package:Smartify/services/connectivity_service.dart';
@@ -22,13 +22,13 @@ class RoomView extends StatefulWidget {
   State<RoomView> createState() => _RoomViewState();
 }
 
-class _RoomViewState extends State<RoomView>  with WidgetsBindingObserver, RouteAware{
+class _RoomViewState extends State<RoomView>
+    with WidgetsBindingObserver, RouteAware {
   final HomeController controller = Get.put(HomeController());
 
   final LoginController loginController = Get.find<LoginController>();
   final ConnectivityService connectivityService =
       Get.find<ConnectivityService>();
-
 
   Timer? _timer;
 
@@ -36,7 +36,7 @@ class _RoomViewState extends State<RoomView>  with WidgetsBindingObserver, Route
   void initState() {
     super.initState();
 
-     WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance.addObserver(this);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       controller.getAllRoomsData();
@@ -61,15 +61,13 @@ class _RoomViewState extends State<RoomView>  with WidgetsBindingObserver, Route
     }
   }
 
-
-
-
-
-   @override
+  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     routeObserver.subscribe(
-        this, ModalRoute.of(context)!); // Subscribe to route changes
+      this,
+      ModalRoute.of(context)!,
+    ); // Subscribe to route changes
   }
 
   @override
@@ -100,9 +98,9 @@ class _RoomViewState extends State<RoomView>  with WidgetsBindingObserver, Route
   void _startAutoRefresh() {
     _stopAutoRefresh(); // ensure only one timer runs
     print("⏱️ Starting timer");
-    _timer = Timer.periodic(Duration(seconds:2), (timer) {
+    _timer = Timer.periodic(Duration(seconds: 2), (timer) {
       if (mounted && connectivityService.isOnline.value) {
-        controller.GetDeviceLiveStatus();
+        // controller.GetDeviceLiveStatus();
         print("Fetching live status...");
       }
     });
@@ -201,13 +199,10 @@ class _RoomViewState extends State<RoomView>  with WidgetsBindingObserver, Route
                       childAspectRatio: 1,
                     ),
                     delegate: SliverChildBuilderDelegate((context, index) {
-
                       Device device = widget.room.devices[index];
-                      bool val = device.status.contains("on");
-                    
-                      
 
-                      if (device.iconName.toLowerCase() == "fan" ) {//|| device.deviceName.toLowerCase() == "fan"
+                      if (device.iconName.toLowerCase() == "fan") {
+                        //|| device.deviceName.toLowerCase() == "fan"
                         return GestureDetector(
                           onTap: () {
                             Get.dialog(
@@ -239,14 +234,14 @@ class _RoomViewState extends State<RoomView>  with WidgetsBindingObserver, Route
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                 Icon(
-                                      device.icon ?? Icons.device_unknown,
-                                      size: screenWidth * 0.15,
-                                      color: Colors.black,
-                                    ),
+                                Icon(
+                                  device.icon ?? Icons.device_unknown,
+                                  size: screenWidth * 0.15,
+                                  color: Colors.black,
+                                ),
                                 SizedBox(height: 10),
-                               Text(
-                                  device.deviceName,
+                                Text(
+                                  device.deviceName.value,
                                   style: GoogleFonts.poppins(
                                     fontSize: screenWidth * 0.045,
                                     fontWeight: FontWeight.w600,
@@ -287,23 +282,27 @@ class _RoomViewState extends State<RoomView>  with WidgetsBindingObserver, Route
                                       color: Colors.black,
                                     ),
                                     Spacer(),
-                                    Obx(
-                                      () => Switch(
-                                        value: device.status.value == "ON",
+                                    Obx(() {
+                                      
+                                      final bool isOn =
+                                          controller.tempSwitchStatus[device
+                                              .id] ??
+                                          (device.status.value == "ON");
+
+                                      return Switch(
+                                        value: isOn,
                                         onChanged: (value) {
-                                          controller.toggleDeviceState(
-                                            device,
-                                          ); // Call function to update API
+                                          controller.toggleDeviceState(device);
                                         },
                                         activeColor: Colors.green,
                                         inactiveTrackColor: Colors.grey,
-                                      ),
-                                    ),
+                                      );
+                                    }),
                                   ],
                                 ),
                                 const SizedBox(height: 20),
                                 Text(
-                                  device.deviceName,
+                                  device.deviceName.value,
                                   style: GoogleFonts.poppins(
                                     fontSize: screenWidth * 0.045,
                                     fontWeight: FontWeight.w600,

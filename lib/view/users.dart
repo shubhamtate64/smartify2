@@ -183,7 +183,7 @@ class _UserListScreenState extends State<UserListScreen>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "${user.name.value} ${user.lastName.value}",
+                      "${user.firstName.value} ${user.lastName.value}",
                       style: GoogleFonts.aDLaMDisplay(
                         color: Colors.black,
                         fontSize: baseFontSize + 2,
@@ -328,7 +328,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          widget.user.name.value,
+          widget.user.firstName.value,
           style: GoogleFonts.aDLaMDisplay(
             color: Colors.black,
             fontSize: getResponsiveFontSize(context, 20),
@@ -350,7 +350,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "${widget.user.name.value} ${widget.user.lastName.value}",
+                    "${widget.user.firstName.value} ${widget.user.lastName.value}",
                     style: GoogleFonts.aDLaMDisplay(
                       fontSize: getResponsiveFontSize(context, 18),
                       fontWeight: FontWeight.bold,
@@ -545,7 +545,7 @@ class _DeviceSwitchState extends State<DeviceSwitch> {
   Widget build(BuildContext context) {
     return SwitchListTile(
       title: Text(
-        widget.device.deviceName,
+        widget.device.deviceName.value,
         style: GoogleFonts.aDLaMDisplay(
           fontSize: getResponsiveFontSize(context, 16),
           color: Colors.black,

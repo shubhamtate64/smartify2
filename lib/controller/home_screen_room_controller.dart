@@ -47,7 +47,11 @@ class HomeController extends GetxController {
    Timer? timer;  // Loading state// Reactive variable for room name error
   LoginController loginController = Get.find<LoginController>();
 
-  RxBool isOnOFF = false.obs;
+  var isSwitchOnOFF = false.obs;
+   var fanTempSpeed = ''.obs;
+
+// In your controller
+var tempSwitchStatus = RxMap<int, bool>(); // device.id -> ON/OFF
 
   // Define room types and their corresponding icons
   Map<String, IconData> roomIcons = {
@@ -115,7 +119,7 @@ class HomeController extends GetxController {
 
       // 🛑 Check if jsonResponse is null or empty
       if (jsonResponse.isEmpty) {
-        Get.snackbar("Error", "Empty response from server");
+        // Get.snackbar("Error", "Empty response from server");
         return;
       }
 
@@ -646,23 +650,36 @@ Future<bool> sendDeviceToServer(Device device) async {
 
 
 
- void toggleDeviceState(Device device) async {
-  String actionCommand = device.status.value.toUpperCase() == "OFF" ? device.action[0] : device.action[1]; 
-  // String actionCommand = isOnOFF.value  ? device.action[0] : device.action[1]; 
+void toggleDeviceState(Device device) async {
+  // Get current state from temp or fallback to actual status
+  final currentStatus = tempSwitchStatus[device.id] ?? (device.status.value == "ON");
 
-  // Call API to update status using action command
+  // Determine action based on current status
+  String actionCommand = currentStatus ? device.action[1] : device.action[0];
+
   bool success = await updateDeviceStatus(device.id, actionCommand);
 
   if (success) {
-    
-    // If API is successful, update the status
-    device.status.value = (device.status.value == "OFF") ? "ON" : "OFF";
-    update();
+    // Toggle status
+    final newStatus = !currentStatus;
+
+    // Update temporary override
+    tempSwitchStatus[device.id] = newStatus;
+
+    // Update actual device (optional if using only temp in UI)
+    device.status.value = newStatus ? "ON" : "OFF";
+
+    update(); // Notify listeners
   } else {
-    // Show error message
-    Get.snackbar("Error", "Failed to update device", backgroundColor: Colors.red, colorText: Colors.white);
+    Get.snackbar(
+      "Error",
+      "Failed to update device",
+      backgroundColor: Colors.red,
+      colorText: Colors.white,
+    );
   }
 }
+
 
 Future<bool> updateDeviceStatus(int deviceId, String actionCommand) async {
 
@@ -696,7 +713,10 @@ void updateFanState(Device device, String newState) async {
   bool success = await updateDeviceStatus(device.id, newState);
 
   if (success) {
+    
     device.status.value = newState;
+        fanTempSpeed.value = newState;
+    
     // log("Status after update: ${device.status.value}");
 
     // Optional if using Obx: update(); refresh(); not needed usually
