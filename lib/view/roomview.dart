@@ -100,7 +100,7 @@ class _RoomViewState extends State<RoomView>
     print("⏱️ Starting timer");
     _timer = Timer.periodic(Duration(seconds: 2), (timer) {
       if (mounted && connectivityService.isOnline.value) {
-        // controller.GetDeviceLiveStatus();
+        controller.GetDeviceLiveStatus();
         print("Fetching live status...");
       }
     });
