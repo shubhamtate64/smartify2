@@ -98,7 +98,7 @@ class _RoomViewState extends State<RoomView>
   void _startAutoRefresh() {
     _stopAutoRefresh(); // ensure only one timer runs
     print("⏱️ Starting timer");
-    _timer = Timer.periodic(Duration(seconds: 2), (timer) {
+    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
       if (mounted && connectivityService.isOnline.value) {
         controller.GetDeviceLiveStatus();
         print("Fetching live status...");

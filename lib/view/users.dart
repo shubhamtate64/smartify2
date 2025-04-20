@@ -1,5 +1,7 @@
 import 'dart:developer';
 
+import 'package:Smartify/services/connectivity_service.dart';
+import 'package:Smartify/view/baseScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -24,6 +26,8 @@ class UserListScreen extends StatefulWidget {
 class _UserListScreenState extends State<UserListScreen>
     with RouteAware, SingleTickerProviderStateMixin {
   final HomeController homeController = Get.find<HomeController>();
+   final ConnectivityService connectivityService =
+      Get.find<ConnectivityService>();
   late TabController _tabController ; // ✅ Match the actual number of views
 
   // @override
@@ -37,7 +41,10 @@ class _UserListScreenState extends State<UserListScreen>
   @override
   void initState() {
     super.initState();
-    homeController.getAllUserData(); // load initially
+    if (connectivityService.isOnline.value) {
+      homeController.getAllUserData();
+    }
+    // load initially
     _tabController = TabController(
       length: 3,
       vsync: this,
@@ -106,7 +113,7 @@ class _UserListScreenState extends State<UserListScreen>
                 ),
               ),
             ),
-
+    
             // Tab(
             //   child: Text(
             //     "Deleted",
@@ -122,16 +129,16 @@ class _UserListScreenState extends State<UserListScreen>
             child: CircularProgressIndicator(),
           ); // Show loader while fetching data
         }
-
+    
         return TabBarView(
           controller: _tabController,
           children: [
             // Tab for All users
             _buildUserList('All'),
-
+    
             // Tab for Pending users
             _buildUserList('P'),
-
+    
             // Tab for Accepted users
             _buildUserList('A'),
           ],

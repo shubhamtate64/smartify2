@@ -1,3 +1,4 @@
+import 'package:Smartify/view/baseScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:Smartify/httplocalhost/httpglobal.dart';
+import 'package:Smartify/services/connectivity_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
@@ -63,6 +64,19 @@ class ChangePasswordController extends GetxController {
   }
 
   Future<void> updatePassword(String email, String newPassword,String oldPassword) async {
+
+    final isOnline = Get.find<ConnectivityService>().isOnline.value;
+
+  if (!isOnline) {
+    Get.snackbar(
+      "No Internet",
+      "Please check your internet connection",
+      backgroundColor: Colors.red,
+      colorText: Colors.white,
+      snackPosition: SnackPosition.BOTTOM,
+    );
+    return ;
+  }
     try {
       isLoading(true);
       var response = await http.post(
