@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:Smartify/controller/WeatherController.dart';
 import 'package:Smartify/firebase_options.dart';
+import 'package:Smartify/view/splash_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
@@ -85,7 +86,7 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-      home: LoginScreen(), // Your initial screen
+      home: SplashScreen(), // Your initial screen
     );
   }
 }
