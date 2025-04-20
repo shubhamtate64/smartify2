@@ -1,3 +1,5 @@
+import 'package:Smartify/services/connectivity_service.dart';
+import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:get/get.dart';
 import 'package:geolocator/geolocator.dart';
@@ -15,10 +17,25 @@ class WeatherController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+     
     fetchWeather();
   }
 Future<void> fetchWeather() async {
   isLoading.value = true;
+
+
+  // final isOnline = Get.find<ConnectivityService>().isOnline.value;
+
+  // if (!isOnline) {
+  //   Get.snackbar(
+  //     "No Internet",
+  //     "Please check your internet connection",
+  //     backgroundColor: Colors.red,
+  //     colorText: Colors.white,
+  //     snackPosition: SnackPosition.BOTTOM,
+  //   );
+  //   return ;
+  // }
 
   try {
     bool hasPermission = await _checkPermission();
@@ -46,7 +63,9 @@ Future<void> fetchWeather() async {
       Get.snackbar("Error", "Failed to fetch weather data");
     }
   } catch (e) {
-    Get.snackbar("Error", "Something went wrong");
+    // Get.snackbar("Error", "Something went wrong");
+    isLoading.value = true;
+    update();
   } finally {
     isLoading.value = false;
   }

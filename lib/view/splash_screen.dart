@@ -36,7 +36,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     });
 
     Future.delayed(Duration(seconds: 3),
-    () => Get.offAll(LoginScreen()),);
+    () => Get.offAll(()=>LoginScreen()),);
   }
 
   @override

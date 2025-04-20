@@ -7,6 +7,7 @@ import 'dart:math' show Random;
 
 
 
+import 'package:Smartify/services/connectivity_service.dart';
 import 'package:get/get.dart';
 import '../controller/login_screen_controller.dart';
 
@@ -102,6 +103,19 @@ var tempSwitchStatus = RxMap<int, bool>(); // device.id -> ON/OFF
 //   }
 
   Future<void> getAllRoomsData() async {
+
+    final isOnline = Get.find<ConnectivityService>().isOnline.value;
+
+  if (!isOnline) {
+    Get.snackbar(
+      "No Internet",
+      "Please check your internet connection",
+      backgroundColor: Colors.red,
+      colorText: Colors.white,
+      snackPosition: SnackPosition.BOTTOM,
+    );
+    return ;
+  }
 
     log("getAllRooms");
   try {

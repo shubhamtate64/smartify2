@@ -146,6 +146,8 @@ class ProfileController extends GetxController {
   Future<bool> _updateUserProfile() async {
     RxInt rxInt = 0.obs;
 
+    
+
     // Safe conversion with tryParse
     int? parsedInt = int.tryParse(user.id.value);
     if (parsedInt != null) {

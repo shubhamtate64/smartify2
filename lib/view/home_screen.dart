@@ -30,7 +30,7 @@ class _HomePageState extends State<HomePage>
   final notificationPageController = Get.put(NotificationPageController());
   final ConnectivityService connectivityService =
       Get.find<ConnectivityService>();
-  var weatherController;
+ late WeatherController weatherController;
 
   final notificationCount = 5.obs;
 
@@ -45,6 +45,7 @@ class _HomePageState extends State<HomePage>
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       controller.getAllRoomsData();
+      
       // controller.GetDeviceLiveStatus();
     });
 

@@ -1,3 +1,4 @@
+import 'package:Smartify/view/BaseScreen2.dart';
 import 'package:Smartify/view/baseScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -56,7 +57,7 @@ class MyDrawer extends StatelessWidget {
             text: "Profile",
             onTap: () {
               Get.back();
-              Get.to(() => BaseScreen(child: ProfileView()));
+              Get.to(() => BaseScreen2(child: ProfileView()));
             },
           ),
 
@@ -69,7 +70,7 @@ class MyDrawer extends StatelessWidget {
                   text: "Users",
                   onTap: () {
                     Get.back();
-                    Get.to(() => BaseScreen(child: UserListScreen()));
+                    Get.to(() => BaseScreen2(child: UserListScreen()));
                   },
                 )
                 : SizedBox();
